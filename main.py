@@ -15,17 +15,18 @@ class Inzeraty(tk.Tk):
         self.geometry("800x600")
 
 
-        #Load sections and categories
+        # Load sections and categories
         self.load_sections()
 
 
-        #Create both tables
+        # Create both tables
         self.create_tables()
 
-        #Create widhets
+        # Create widhets
         self.create_widgets()
 
-
+        # List Adverts
+        self.update_adverts()
 
 
     def create_widgets(self):
@@ -74,7 +75,7 @@ class Inzeraty(tk.Tk):
         self.category_menu = ttk.Combobox(search_frame, textvariable=self.category_var, values=['All'], state='readonly')
         self.category_menu.current(0)
         self.category_menu.pack(side=tk.LEFT)
-        # category_menu.bind('<<ComboboxSelected>>', lambda e: self.update_list())
+        self.category_menu.bind('<<ComboboxSelected>>', lambda e: self.update_adverts())
 
         # BOTTOM FRAME
         bottom_frame = ttk.Frame(self)
@@ -86,18 +87,71 @@ class Inzeraty(tk.Tk):
         left_frame.pack(side=tk.LEFT, expand=True, fill=tk.BOTH)
         right_frame.pack(side=tk.LEFT, expand=True, fill=tk.BOTH)
 
+        # Listbox of 
         self.listbox = tk.Listbox(left_frame)
         self.listbox.pack(fill=tk.BOTH, expand=True)
-        
-        
+        self.listbox.bind('<<ListboxSelect>>', self.on_item_selected)
+
+    
+    def on_item_selected(self,event):
+        widget = event.widget
+        selection = widget.curselection()
+        if selection:
+            index = selection[0]
+            id = self.fetched_adverts[index][0]
+
+            # print(f"Selected index: {index}, id: {id}")
+
+            self.show_advert_details(id)
 
     
     def update_categories(self):
         section = self.section_var.get()
+
+        if section != "All":        
+            self.category_menu["values"] = ["All"] + self.sections[section]
+            self.category_menu.current(0)
+
+        self.update_adverts()
+
+    def update_adverts(self):
+        search = self.search_var.get().lower()
+        section = self.section_var.get()
+        category = self.category_var.get()
+
+        if section == "All":
+            query_str = "SELECT id, title FROM Adverts ORDER BY Likes DESC"
+        else:
+            if category == "All":
+                query_str = "SELECT id, title FROM Adverts WHERE section = '"+section+"' ORDER BY Likes DESC"
+            else:
+                query_str = "SELECT id, title FROM Adverts WHERE category = '"+category+"' ORDER BY Likes DESC"
+
+        print(query_str)
+
+        # Get Adverts
+        with sqlite3.connect('database.db') as connection:
+            cursor = connection.cursor()
+
+            cursor.execute(query_str)
+            self.fetched_adverts = cursor.fetchmany(5)
+
+        # print(fetched_adverts)
         
-        print(section)
-        self.category_menu["values"] = self.sections[section]
-        self.category_menu.current(0)
+
+        self.update_listbox(self.fetched_adverts)
+
+
+    def update_listbox(self,content):
+        self.listbox.delete(0,tk.END)
+        for riadok in content:
+            print(riadok)
+            self.listbox.insert(tk.END,riadok[1])
+
+    def show_advert_details(self,advert_id):
+        pass
+
+
 
 
     def create_tables(self):
@@ -124,7 +178,8 @@ class Inzeraty(tk.Tk):
                 user TEXT,
                 price INTEGER,
                 section TEXT,
-                category TEXT
+                category TEXT,
+                likes INTEGER
             );
             '''
 
@@ -271,8 +326,8 @@ class Inzeraty(tk.Tk):
 
                 # Insert a record into the Adverts table
                 insert_query = '''
-                INSERT INTO Adverts (title, date_created, user, price, section, category) 
-                VALUES (?, ?, ?, ?, ?, ?);
+                INSERT INTO Adverts (title, date_created, user, price, section, category, likes) 
+                VALUES (?, ?, ?, ?, ?, ?,0);
                 '''
 
                 cursor.execute(insert_query, (title,date_created,user,price,section,category))
@@ -332,7 +387,9 @@ class Inzeraty(tk.Tk):
                 
                 section = random.choice(list(self.sections.keys()))
                 category = random.choice(self.sections[section])
-                adverts.append((title, date_created, user, price, section, category))
+                likes = random.randint(0,256)
+
+                adverts.append((title, date_created, user, price, section, category,likes))
 
                 text = ""
                 for sentence in fake.sentences(random.randint(5,11)):
@@ -341,20 +398,22 @@ class Inzeraty(tk.Tk):
 
                 self.create_advert_file(title,text)
 
+
             # print(*adverts,sep="\n")
 
             
             # Insert Adverts
 
             cursor.executemany('''
-            INSERT INTO Adverts (title, date_created, user, price, section, category)
-            VALUES (?, ?, ?, ?, ?, ?);''', adverts)
+            INSERT INTO Adverts (title, date_created, user, price, section, category, likes)
+            VALUES (?, ?, ?, ?, ?, ?, ?);''', adverts)
 
             connection.commit()
 
 
 if __name__ == '__main__':
     i = Inzeraty()
-    # i.mainloop()
+    i.mainloop()
+    # i.fill_random(10,20)
     # print(i.create_user("admin","admin@admin",0,"adminadmin","admin8"))
     # i.create_advert("Test",datetime.datetime(2009, 5, 5),"admin",999,"Ostatné","Jadrové hlavice","skibiditextaôldsfôlsadfjs")
