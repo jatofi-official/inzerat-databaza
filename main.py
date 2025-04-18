@@ -28,6 +28,7 @@ class Inzeraty(tk.Tk):
         # List Adverts
         self.update_adverts()
 
+        self.right_side_created = False
         self.active_user = None
 
     def create_widgets(self):
@@ -80,46 +81,82 @@ class Inzeraty(tk.Tk):
         self.category_menu.bind('<<ComboboxSelected>>', lambda e: self.update_adverts())
 
         # BOTOTM FRAME
-        bottom_frame = ttk.Frame(main_frame)
-        bottom_frame.grid(row=2, column=0, sticky="nsew", padx=5, pady=5)
+        self.bottom_frame = ttk.Frame(main_frame)
+        self.bottom_frame.grid(row=2, column=0, sticky="nsew", padx=5, pady=5)
 
         main_frame.rowconfigure(2, weight=1)
 
         # Proporitons here:
-        bottom_frame.columnconfigure(0, weight=2, uniform="half")
-        bottom_frame.columnconfigure(1, weight=3, uniform="half")
-        bottom_frame.rowconfigure(0, weight=1)
+        self.bottom_frame.columnconfigure(0, weight=2, uniform="half")
+        self.bottom_frame.columnconfigure(1, weight=3, uniform="half")
+        self.bottom_frame.rowconfigure(0, weight=1)
 
 
 
         # LEFT FRAME
-        left_frame = tk.Frame(bottom_frame, bg="white")
+        left_frame = tk.Frame(self.bottom_frame)
         left_frame.grid(row=0, column=0, sticky="nsew")
-
-        # RIGHT FRAME
-        right_frame = tk.Frame(bottom_frame, bg="blue")
-        right_frame.grid(row=0, column=1, sticky="nsew")
 
         # Left content
         self.listbox = tk.Listbox(left_frame)
         self.listbox.pack(fill=tk.BOTH, expand=True)
         self.listbox.bind('<<ListboxSelect>>', self.on_item_selected)
 
+    def create_right_side(self):
+        # RIGHT FRAME
+        right_frame = tk.Frame(self.bottom_frame)
+        right_frame.grid(row=0, column=1, sticky="nsew")
+
         # Right content 
+        # TOP FRAME
         advert_top_frame = ttk.Frame(right_frame)
         advert_top_frame.pack(fill=tk.X)
 
         advert_top_frame.columnconfigure(0, weight=1)
         advert_top_frame.columnconfigure(1, weight=0)
 
-        self.advert_title = ttk.Label(advert_top_frame,text="Advert_name",font=("Arial", 16, "bold"),anchor="w")
+        self.advert_title = ttk.Label(advert_top_frame,text="",font=("Arial", 16, "bold"),anchor="w")
         self.advert_title.grid(row=0, column=0, sticky="w", padx=5)
 
-        self.advert_like_count = ttk.Label(advert_top_frame,text="Likes: 123👍",anchor="e")
+        self.advert_like_count = ttk.Label(advert_top_frame,text="",anchor="e")
         self.advert_like_count.grid(row=0, column=1, sticky="e", padx=5)
 
+        # Middle text
+        self.advert_text_field = tk.Text(right_frame)
+        self.advert_text_field.pack(fill=tk.X)
+        self.advert_text_field.insert(tk.END,"")
+        self.advert_text_field.config(state=tk.DISABLED)
 
+        # BOTTOM FRAME
+        advert_bottom_frame = ttk.Frame(right_frame)
+        advert_bottom_frame.pack(fill=tk.X)
+        advert_bottom_frame.columnconfigure(0,weight=1)
 
+        #user
+        self.advert_user = ttk.Label(advert_bottom_frame,text="",anchor="w")
+        self.advert_user.grid(row=0, column=0, sticky="w", padx=5)
+        # email
+        self.advert_mail = ttk.Label(advert_bottom_frame,text="",anchor="w")
+        self.advert_mail.grid(row=1, column=0, sticky="w", padx=5)
+        # phone
+        self.advert_phone = ttk.Label(advert_bottom_frame,text="",anchor="w")
+        self.advert_phone.grid(row=2, column=0, sticky="w", padx=5)
+        # date
+        self.advert_date = ttk.Label(advert_bottom_frame,text="",anchor="w")
+        self.advert_date.grid(row=3, column=0, sticky="w", padx=5)
+        # like
+        self.advert_like_button = ttk.Button(advert_bottom_frame,text="Like")
+        self.advert_like_button.grid(row=4, column=0, sticky="w", padx=5)
+        
+        # edit and delete buttons
+        button_frame = ttk.Frame(advert_bottom_frame)
+        button_frame.grid(row=0, column=1, rowspan=4, sticky="ne", padx=5, pady=5)
+
+        self.advert_edit_button = ttk.Button(button_frame, text="Edit", state=tk.DISABLED)
+        self.advert_edit_button.pack(fill="x", pady=(0,5))
+
+        self.advert_delete_button = ttk.Button(button_frame, text="Delete", state=tk.DISABLED)
+        self.advert_delete_button.pack(fill="x")
 
 
 
@@ -202,6 +239,10 @@ class Inzeraty(tk.Tk):
 
             # print(f"Selected index: {index}, id: {id}")
 
+            if not self.right_side_created:
+                self.create_right_side()
+                self.right_side_created = True
+
             self.show_advert_details(id)
 
     
@@ -229,7 +270,6 @@ class Inzeraty(tk.Tk):
             else:
                 query_str = "SELECT id, title FROM Adverts WHERE category = '"+category+"' ORDER BY likes DESC;"
 
-        print(query_str)
 
         # Get Adverts
         with sqlite3.connect('database.db') as connection:
@@ -251,23 +291,42 @@ class Inzeraty(tk.Tk):
 
     def show_advert_details(self,advert_id):
         query_str = "SELECT * FROM Adverts WHERE id=?;"
-        print(advert_id)
 
         with sqlite3.connect('database.db') as connection:
             cursor = connection.cursor()
 
             cursor.execute(query_str,(advert_id,))
 
-            result = cursor.fetchone()
+            advert_result = cursor.fetchone()
+            cursor.execute("SELECT * FROM Users WHERE username=?;",(advert_result[3],))
+            user_result = cursor.fetchone()
+        
+        #AFFECT STUFF
+        self.advert_title.config(text=advert_result[1])
+        self.advert_like_count.config(text="Likes: "+str(advert_result[7])+"👍")
+        
+        # text field
+        self.advert_text_field.config(state=tk.NORMAL)
+        self.advert_text_field.delete("1.0",tk.END)
+        obsah = self.get_advert_text(advert_result[1])
+        
+        self.advert_text_field.insert(tk.END,obsah)
+        self.advert_text_field.config(state=tk.DISABLED)
 
-        print(result)
-        #affect stuff
-        self.advert_title.config(text=result[1])
-        self.advert_like_count.config(text="Likes: "+str(result[7])+"👍")
+        # user details
+        self.advert_user.config(text="User: "+user_result[1])
+        self.advert_mail.config(text="Email: "+user_result[3])
+        self.advert_phone.config(text="Phone: "+str(user_result[4]))
+        
+        # date
+        self.advert_date.config(text="Posted on: "+str(advert_result[2]))
 
-
-
-
+    def get_advert_text(self, title):
+        title_hash = self.title_hash(title)
+        with open("Adverts/"+title_hash+".dat","rb") as subor:
+            obsah = subor.read().decode()
+            # print(type(obsah))
+            return obsah
 
     def create_tables(self):
         with sqlite3.connect('database.db') as connection:
