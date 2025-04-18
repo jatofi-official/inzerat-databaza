@@ -28,48 +28,50 @@ class Inzeraty(tk.Tk):
         # List Adverts
         self.update_adverts()
 
+        self.active_user = None
 
     def create_widgets(self):
-        # TOP FRAME 
+        main_frame = tk.Frame(self)
+        main_frame.pack(fill=tk.BOTH, expand=True)
 
-        top_frame = ttk.Frame(self)
-        top_frame.pack(fill=tk.X, pady=5)
+        # MAIN FRAME
+        main_frame.rowconfigure(2, weight=1)
+        main_frame.columnconfigure(0, weight=1)
 
-        register_button = ttk.Button(top_frame, text="Register")
-        register_button.pack(side=tk.RIGHT,padx=5)
+        # TOP FRAME
+        top_frame = ttk.Frame(main_frame)
+        top_frame.grid(row=0, column=0, sticky="ew", pady=5)
 
-        login_button = ttk.Button(top_frame, text="Login")
-        login_button.pack(side=tk.RIGHT, padx=5)
+        self.register_button = ttk.Button(top_frame, text="Register",command=self.register_button_pressed)
+        self.register_button.pack(side=tk.RIGHT, padx=5)
+
+        self.login_button = ttk.Button(top_frame, text="Login",command=self.login_button_pressed)
+        self.login_button.pack(side=tk.RIGHT, padx=5)
 
         self.user_label = ttk.Label(top_frame, text="Not logged in")
         self.user_label.pack(side=tk.RIGHT, padx=5)
 
 
         # SEARCH FRAME
+        search_frame = ttk.Frame(main_frame)
+        search_frame.grid(row=1, column=0, sticky="ew", pady=(10, 5))
 
-        search_frame = ttk.Frame(self)
-        search_frame.pack(fill=tk.X, pady=(10,5))
-
-        # Search entry
-        ttk.Label(search_frame, text="Search:").pack(side=tk.LEFT,padx=5)
+        ttk.Label(search_frame, text="Search:").pack(side=tk.LEFT, padx=5)
         self.search_var = tk.StringVar()
-
-        self.search_var = tk.StringVar()
-        search_entry = ttk.Entry(search_frame,textvariable=self.search_var)
-        search_entry.pack(side=tk.LEFT,padx=5)
-        # search_entry = ttk.Entry(search_frame, textvariable=self.search_var)
+        search_entry = ttk.Entry(search_frame, textvariable=self.search_var)
+        search_entry.pack(side=tk.LEFT, padx=5)
 
         # Sections
-        ttk.Label(search_frame, text="Section:").pack(side=tk.LEFT,padx=(6,0))
+        ttk.Label(search_frame, text="Section:").pack(side=tk.LEFT, padx=(6,0))
         self.section_var = tk.StringVar()
 
-        self.section_menu = ttk.Combobox(search_frame, textvariable=self.section_var, values=['All'] + [key for key in self.sections.keys()], state='readonly')
+        self.section_menu = ttk.Combobox(search_frame, textvariable=self.section_var, values=['All'] + list(self.sections.keys()), state='readonly')
         self.section_menu.current(0)
         self.section_menu.pack(side=tk.LEFT)
         self.section_menu.bind('<<ComboboxSelected>>', lambda e: self.update_categories())
 
         # Categories
-        ttk.Label(search_frame, text="Category:").pack(side=tk.LEFT,padx=(6,0))
+        ttk.Label(search_frame, text="Category:").pack(side=tk.LEFT, padx=(6,0))
         self.category_var = tk.StringVar()
 
         self.category_menu = ttk.Combobox(search_frame, textvariable=self.category_var, values=['All'], state='readonly')
@@ -77,22 +79,120 @@ class Inzeraty(tk.Tk):
         self.category_menu.pack(side=tk.LEFT)
         self.category_menu.bind('<<ComboboxSelected>>', lambda e: self.update_adverts())
 
-        # BOTTOM FRAME
-        bottom_frame = ttk.Frame(self)
-        bottom_frame.pack(fill=tk.X,padx=5,pady=5)
+        # BOTOTM FRAME
+        bottom_frame = ttk.Frame(main_frame)
+        bottom_frame.grid(row=2, column=0, sticky="nsew", padx=5, pady=5)
 
-        left_frame = tk.Frame(bottom_frame, bg="red")
+        main_frame.rowconfigure(2, weight=1)
+
+        # Proporitons here:
+        bottom_frame.columnconfigure(0, weight=2, uniform="half")
+        bottom_frame.columnconfigure(1, weight=3, uniform="half")
+        bottom_frame.rowconfigure(0, weight=1)
+
+
+
+        # LEFT FRAME
+        left_frame = tk.Frame(bottom_frame, bg="white")
+        left_frame.grid(row=0, column=0, sticky="nsew")
+
+        # RIGHT FRAME
         right_frame = tk.Frame(bottom_frame, bg="blue")
+        right_frame.grid(row=0, column=1, sticky="nsew")
 
-        left_frame.pack(side=tk.LEFT, expand=True, fill=tk.BOTH)
-        right_frame.pack(side=tk.LEFT, expand=True, fill=tk.BOTH)
-
-        # Listbox of 
+        # Left content
         self.listbox = tk.Listbox(left_frame)
         self.listbox.pack(fill=tk.BOTH, expand=True)
         self.listbox.bind('<<ListboxSelect>>', self.on_item_selected)
 
+        # Right content 
+        advert_top_frame = ttk.Frame(right_frame)
+        advert_top_frame.pack(fill=tk.X)
+
+        advert_top_frame.columnconfigure(0, weight=1)
+        advert_top_frame.columnconfigure(1, weight=0)
+
+        self.advert_title = ttk.Label(advert_top_frame,text="Advert_name",font=("Arial", 16, "bold"),anchor="w")
+        self.advert_title.grid(row=0, column=0, sticky="w", padx=5)
+
+        self.advert_like_count = ttk.Label(advert_top_frame,text="Likes: 123👍",anchor="e")
+        self.advert_like_count.grid(row=0, column=1, sticky="e", padx=5)
+
+
+
+
+
+
+    def login_button_pressed(self):
+        if self.active_user is None:
+            win = tk.Toplevel(self)
+            
+            win.title("Login")
+            win.geometry("300x200")
+
+            win.resizable(False, False)
+
+            self.error_message = ttk.Label(win, text="Enter login details below:")
+            self.error_message.grid(row=0, column=0, columnspan=2, pady=10)
+
+            
+            ttk.Label(win, text="Username:").grid(row=1, column=0, pady=5, padx=5, sticky="e")
+            username_entry = ttk.Entry(win)
+            username_entry.grid(row=1, column=1, pady=5, padx=5)
+
+            ttk.Label(win, text="Password:").grid(row=2, column=0, pady=5, padx=5, sticky="e")
+            password_entry = ttk.Entry(win, show="*")
+            password_entry.grid(row=2, column=1, pady=5, padx=5)
+
+            def login_action():
+                typed_username = username_entry.get()  
+                typed_password = password_entry.get()
+
+                hashed = self.passsword_hash(typed_password)
+
+                # Check login information                
+                query_str = "SELECT * FROM Users WHERE username = ? AND password = ?"
+                with sqlite3.connect('database.db') as connection:
+                    cursor = connection.cursor()
+                    query_str = "SELECT * FROM Users WHERE username = ? AND password = ?"
+                    cursor.execute(query_str, (typed_username, hashed))
+                    result = cursor.fetchone()
+
+
+                if result:  # SUCCESSFUL LOGIN
+                    self.log_in(result)
+                    win.destroy()
+                else:
+                    self.error_message.config(text="Incorrect username or password!")
+
+            # Login button
+            ttk.Button(win, text="Login", command=login_action).grid(row=3, column=0, columnspan=2, pady=10)
+        
+        else:
+            self.log_out()
+
+    #TODO     
+    def register_button_pressed(self):
+        if self.active_user is None:
+            print("register")
+        else:
+            print("settings")
+
+
+    def log_in(self,result):
+        self.user_label.config(text=result[1])
+        self.login_button.config(text="Log out")
+        self.register_button.config(text="Settings")
+        self.active_user = result[1]
     
+    def log_out(self):
+        result = messagebox.askquestion("askquestion", "Do you really want to log out?") 
+        if result == "yes":
+            self.user_label.config(text="Not logged in")
+            self.login_button.config(text="Login")
+            self.register_button.config(text="Register")
+            self.active_user = None
+
     def on_item_selected(self,event):
         widget = event.widget
         selection = widget.curselection()
@@ -114,18 +214,20 @@ class Inzeraty(tk.Tk):
 
         self.update_adverts()
 
+
+    #does the query
     def update_adverts(self):
         search = self.search_var.get().lower()
         section = self.section_var.get()
         category = self.category_var.get()
 
         if section == "All":
-            query_str = "SELECT id, title FROM Adverts ORDER BY Likes DESC"
+            query_str = "SELECT id, title FROM Adverts ORDER BY likes DESC;"
         else:
             if category == "All":
-                query_str = "SELECT id, title FROM Adverts WHERE section = '"+section+"' ORDER BY Likes DESC"
+                query_str = "SELECT id, title FROM Adverts WHERE section = '"+section+"' ORDER BY likes DESC;"
             else:
-                query_str = "SELECT id, title FROM Adverts WHERE category = '"+category+"' ORDER BY Likes DESC"
+                query_str = "SELECT id, title FROM Adverts WHERE category = '"+category+"' ORDER BY likes DESC;"
 
         print(query_str)
 
@@ -134,7 +236,7 @@ class Inzeraty(tk.Tk):
             cursor = connection.cursor()
 
             cursor.execute(query_str)
-            self.fetched_adverts = cursor.fetchmany(5)
+            self.fetched_adverts = cursor.fetchmany(25) #EDIT HERE HOW MANY TO FETCH
 
         # print(fetched_adverts)
         
@@ -145,11 +247,24 @@ class Inzeraty(tk.Tk):
     def update_listbox(self,content):
         self.listbox.delete(0,tk.END)
         for riadok in content:
-            print(riadok)
             self.listbox.insert(tk.END,riadok[1])
 
     def show_advert_details(self,advert_id):
-        pass
+        query_str = "SELECT * FROM Adverts WHERE id=?;"
+        print(advert_id)
+
+        with sqlite3.connect('database.db') as connection:
+            cursor = connection.cursor()
+
+            cursor.execute(query_str,(advert_id,))
+
+            result = cursor.fetchone()
+
+        print(result)
+        #affect stuff
+        self.advert_title.config(text=result[1])
+        self.advert_like_count.config(text="Likes: "+str(result[7])+"👍")
+
 
 
 
@@ -413,7 +528,8 @@ class Inzeraty(tk.Tk):
 
 if __name__ == '__main__':
     i = Inzeraty()
+    # i.insert_user("admin","",0,i.passsword_hash("admin"),"admin")
+    
     i.mainloop()
-    # i.fill_random(10,20)
-    # print(i.create_user("admin","admin@admin",0,"adminadmin","admin8"))
-    # i.create_advert("Test",datetime.datetime(2009, 5, 5),"admin",999,"Ostatné","Jadrové hlavice","skibiditextaôldsfôlsadfjs")
+    
+    # i.fill_random(0,20)
