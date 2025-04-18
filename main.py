@@ -1,6 +1,7 @@
 import sqlite3
 import hashlib
 import datetime
+import random
 
 class Inzeraty:
     def __init__(self):
@@ -82,15 +83,22 @@ class Inzeraty:
 
         #create username
         if username is None:
-            username = "_".join(name.lower().split(" "))
+            username = "_".join(name.lower().split(" "))+str(random.randint(0,1000))
+
+            while not self.check_valid_username(username):
+                if username is None:
+                    username = "_".join(name.lower().split(" "))+str(random.randint(0,1000))
+        else:
+            if not self.check_valid_username(username):
+                return "Username already exists"
+
         
+
         #insert into database
         result = self.insert_user(name,email,phone,hashed,username)
         return result
 
-
     def insert_user(self,name,email,phone,password,username):
-
         try:
 
             #insert into database
@@ -113,10 +121,22 @@ class Inzeraty:
         except Exception as e:
             print("Error insertig into database: ",e)
             return False
-    
+
+
+    def check_valid_username(self,username):
+        with sqlite3.connect("database.db") as connection:
+            cursor = connection.cursor()
+            cursor.execute("SELECT username FROM Users where username= ?",(username,))
+            data = cursor.fetchall()
+            if not data: #username not found => is unique
+                return True
+            else:
+                return False
+
     def passsword_hash(self, password):
         return hashlib.sha256(password.encode()).hexdigest()
-    
+
+
     def create_advert(self,title,date_created, user, price, section, category,text):
         #check for conditions
         
@@ -140,6 +160,14 @@ class Inzeraty:
 
         #insert advert
         result = self.insert_advert(title,date_created,user,price,section,category)
+        
+        #create advert text file 
+        if result:
+            nazov = self.title_hash(title)
+            with open("Adverts/"+nazov+".dat","wb") as subor:
+                byte_text = text.encode()
+                subor.write(byte_text)
+            
 
     def insert_advert(self,title,date_created, user, price, section, category):
 
@@ -164,7 +192,10 @@ class Inzeraty:
             print("Error insertig into database: ",e)
             return False
 
+    def title_hash(self,title):
+        return hashlib.md5(title.encode()).hexdigest()
+
 
 i = Inzeraty()
-print(i.create_user("admin","admin@admin",0,"adminadmin"))
-# print(i.add_advert("Test",datetime.datetime(2009, 5, 5),"milan_lasica",999,"Ostatné","Jadrové hlavice"))
+# print(i.create_user("admin","admin@admin",0,"adminadmin","admin8"))
+# i.create_advert("Test",datetime.datetime(2009, 5, 5),"admin",999,"Ostatné","Jadrové hlavice","skibiditextaôldsfôlsadfjs")
