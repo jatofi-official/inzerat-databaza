@@ -14,6 +14,8 @@ class Inzeraty(tk.Tk):
         self.title("Adverts")
         self.geometry("800x600")
 
+        self.resizable(False, False)
+
 
         # Load sections and categories
         self.load_sections()
@@ -161,12 +163,41 @@ class Inzeraty(tk.Tk):
         button_frame = ttk.Frame(advert_bottom_frame)
         button_frame.grid(row=0, column=1, rowspan=4, sticky="ne", padx=5, pady=5)
 
-        self.advert_edit_button = ttk.Button(button_frame, text="Edit", state=tk.DISABLED)
+        self.advert_edit_button = ttk.Button(button_frame, text="Edit", state=tk.DISABLED,command=self.edit_button_pressed)
         self.advert_edit_button.pack(fill="x", pady=(0,5))
 
-        self.advert_delete_button = ttk.Button(button_frame, text="Delete", state=tk.DISABLED)
+        self.advert_delete_button = ttk.Button(button_frame, text="Delete", state=tk.DISABLED,command=self.delete_button_pressed)
         self.advert_delete_button.pack(fill="x")
 
+
+
+    def delete_button_pressed(self):
+        result = messagebox.askyesno("Delete advert?","Do you really want to delete advert?")
+        if self.active_advert_id is not None:
+            if result: # delete advert
+                query_str = "DELETE FROM Adverts WHERE id = ?;"
+                try:
+                    with sqlite3.connect('database.db') as connection:
+                        cursor = connection.cursor()
+
+                        cursor.execute(query_str,(self.active_advert_id,))
+
+                        connection.commit()
+
+                    
+                    #Hide active advert 
+                    self.active_advert_id = None
+
+                    #TODO here
+
+
+
+                except:
+                    print("Error deleting advert id:",self.active_advert_id)
+
+                
+    def edit_button_pressed(self):
+        print("Edit button pressed")
 
     def search_button_pressed(self):
         self.search_adverts()
@@ -231,7 +262,8 @@ class Inzeraty(tk.Tk):
         self.user_label.config(text=result[1])
         self.login_button.config(text="Log out")
         self.register_button.config(text="Settings")
-        self.active_user = result[1]
+        self.active_user = result[2]
+        # print(result[2])
     
     def log_out(self):
         result = messagebox.askquestion("askquestion", "Do you really want to log out?") 
@@ -241,6 +273,7 @@ class Inzeraty(tk.Tk):
             self.register_button.config(text="Register")
             self.active_user = None
 
+    #When list item is selected
     def on_item_selected(self,event):
         widget = event.widget
         selection = widget.curselection()
@@ -316,8 +349,10 @@ class Inzeraty(tk.Tk):
         for riadok in content:
             self.listbox.insert(tk.END,riadok[1])
 
+    #display data on advert
     def show_advert_details(self,advert_id):
         query_str = "SELECT * FROM Adverts WHERE id=?;"
+
 
         with sqlite3.connect('database.db') as connection:
             cursor = connection.cursor()
@@ -347,6 +382,20 @@ class Inzeraty(tk.Tk):
         
         # date
         self.advert_date.config(text="Posted on: "+str(advert_result[2]))
+        
+        
+
+        # check is active user is the same as creator
+        if self.active_user == advert_result[3]:
+            self.advert_edit_button.config(state=tk.NORMAL)
+            self.advert_delete_button.config(state=tk.NORMAL)
+            self.active_advert_id = advert_id
+        else:
+            self.advert_edit_button.config(state=tk.DISABLED)
+            self.advert_delete_button.config(state=tk.DISABLED) 
+            self.active_advert_id = None
+
+
 
     def get_advert_text(self, title):
         title_hash = self.title_hash(title)
@@ -622,7 +671,7 @@ class Inzeraty(tk.Tk):
 if __name__ == '__main__':
     i = Inzeraty()
     # i.insert_user("admin","",0,i.passsword_hash("admin"),"admin")
-    # i.create_advert("I want to sell my PC",datetime.date.today(),"admin",9999,"PC","Desktop","This is my very special pc, I built it lorem ipsum lorem ipsum")
+    i.create_advert("I want to sell my PC",datetime.date.today(),"admin",9999,"PC","Desktop","This is my very special pc, I built it lorem ipsum lorem ipsum")
     
     i.mainloop()
     

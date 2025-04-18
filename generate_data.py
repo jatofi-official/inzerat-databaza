@@ -36,13 +36,13 @@ with sqlite3.connect('database.db') as connection:
             INSERT INTO Adverts (title, date_created, user, price, section, category, likes) 
             VALUES (?, ?, ?, ?, ?, ?,?);
             '''
-            # if riadok[2] not in usernames:
-            #     users.append(riadok[2])
+            if riadok[2] not in usernames:
+                usernames.append(riadok[2])
             
 
             cursor.execute(insert_query, (riadok[0],riadok[1],riadok[2],riadok[3],riadok[4],riadok[5],riadok[6]))
 
-            create_advert_file(riadok[0],riadok[7])
+            # create_advert_file(riadok[0],riadok[7])
             
     
         except Exception as e:
