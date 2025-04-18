@@ -1,0 +1,100 @@
+Plastový model bomby;2024-11-04;user16;536;Ostatné;Jadrové hlavice;146;Len pre zberateľov, nefunkčné.
+Bavlnené tričko;2025-02-25;user4;4000;Oblečenie;Tričká;10;Veľmi pohodlné, vhodné na bežné nosenie.
+Džínsová sukňa;2024-05-07;user8;4669;Oblečenie;Sukne;182;Štýlová sukňa na leto.
+Drevená posteľ 140x200;2024-08-04;user14;3193;Nábytok;Posteľ;41;Pohodlná posteľ s kvalitným matracom.
+Peugeot 308 Family;2025-01-18;user17;1332;Auto;Rodinné auto;87;Bez nehôd, ideálne na výlety.
+Samsung Curved 27;2024-06-29;user9;3379;PC;Monitor;95;Kvalitný obraz, ideálny na prácu z domu.
+Sto rokov samoty;2024-09-16;user3;1003;Knihy;Román;139;Klasika, ktorú musíte mať doma.
+Písací stôl biely;2024-10-06;user10;857;Nábytok;Stôl;298;Ideálny na prácu alebo štúdium.
+Test z dejepisu – riešenia;2025-01-11;user17;891;Ostatné;Odpovede na najbližší priebežný test;247;Overené riešenia, pomohli mi prejsť!
+Ikea Markus;2024-12-03;user16;1191;Nábytok;Stoličky;55;Používaná, ale stále v dobrom stave.
+Test z dejepisu – riešenia;2025-02-23;user9;2688;Ostatné;Odpovede na najbližší priebežný test;191;Overené riešenia, pomohli mi prejsť!
+MacBook Air M2;2024-11-16;user18;1998;PC;Notebook;136;Rýchly a spoľahlivý laptop.
+Mazda MX-5;2024-10-17;user17;4339;Auto;Športové auto;166;Dynamické vozidlo s výborným výkonom.
+Matematika pre SŠ;2024-11-13;user4;1694;Knihy;Učebnice;45;Vhodné pre študentov, výborný stav.
+Stôl do obývačky;2024-12-23;user12;315;Nábytok;Stôl;80;Ideálny na prácu alebo štúdium.
+BMW M3 2008;2024-05-11;user2;2018;Auto;Športové auto;86;Dynamické vozidlo s výborným výkonom.
+Proti systému!;2024-09-06;user13;2223;Knihy;Pamflet;16;Zaujímavý pohľad na súčasnosť.
+Kancelársky počítač Dell;2024-10-22;user13;2048;PC;Desktop;53;Stabilný systém, pripravený na okamžité použitie.
+Diktáty pre 9. ročník;2024-09-11;user7;1346;Knihy;Učebnice;108;Pomohlo mi pri maturite, odporúčam!
+Lenovo ThinkPad X1;2025-04-05;user2;1595;PC;Notebook;243;Rýchly a spoľahlivý laptop.
+Formálna sukňa;2024-06-24;user6;3017;Oblečenie;Sukne;232;Elegantný kúsok do práce aj na večeru.
+Dekoračná hlavica;2025-03-03;user10;3074;Ostatné;Jadrové hlavice;210;Len pre zberateľov, nefunkčné.
+Džínsy Levi’s;2025-02-20;user14;2055;Oblečenie;Nohavice;241;Pohodlné nohavice vhodné na každodenné nosenie.
+Mini ITX zostava;2024-07-19;user17;2010;PC;Desktop;106;Stabilný systém, pripravený na okamžité použitie.
+Škoda Octavia 2015;2024-05-09;user20;2089;Auto;Rodinné auto;127;Bez nehôd, ideálne na výlety.
+Drevená jedálenská stolička;2024-10-11;user11;2817;Nábytok;Stoličky;170;Pohodlná a pevná stolička, vhodná do každej miestnosti.
+Darček pre všetkých;2025-02-16;user3;3476;Ostatné;Nezaradené;98;Zaujímavý predmet na diskusiu.
+CS:GO Prime;2025-04-03;user14;2673;PC;Hry;267;Perfektný stav, originálne balenie.
+Proti systému!;2024-09-16;user7;2428;Knihy;Pamflet;31;Ostrá kritika spoločnosti, vhodné pre náročných čitateľov.
+Fyzika – základné poznatky;2025-01-22;user4;3475;Knihy;Učebnice;27;Pomohlo mi pri maturite, odporúčam!
+Strešný box Thule;2024-10-17;user4;1387;Auto;Príslušenstvo;296;Praktický doplnok pre každé vozidlo.
+Košeľa s dlhým rukávom;2025-02-26;user13;2010;Oblečenie;Košele;198;Párkrát oblečená, vyzerá ako nová.
+Flanelová košeľa;2024-12-09;user3;1669;Oblečenie;Košele;67;Elegantná košeľa na každú príležitosť.
+Nike Dri-Fit;2024-09-24;user17;3309;Oblečenie;Tričká;118;Veľmi pohodlné, vhodné na bežné nosenie.
+Mazda MX-5;2025-01-22;user3;3828;Auto;Športové auto;258;Dynamické vozidlo s výborným výkonom.
+LG 4K Monitor;2024-08-01;user14;943;PC;Monitor;39;Skvelé farby, bez poškodenia.
+Dekoračná hlavica;2025-01-04;user19;1545;Ostatné;Jadrové hlavice;58;Dekoračný model, nie ostrý.
+LG 4K Monitor;2025-02-28;user11;3726;PC;Monitor;241;Kvalitný obraz, ideálny na prácu z domu.
+Nepomenovateľný predmet;2025-03-27;user10;833;Ostatné;Nezaradené;31;Ťažko opísať, treba vidieť.
+Autonabíjačka Xiaomi;2025-02-27;user6;1485;Auto;Príslušenstvo;196;Takmer nové, veľmi málo používané.
+Dekoračná hlavica;2024-12-23;user18;2484;Ostatné;Jadrové hlavice;248;Len pre zberateľov, nefunkčné.
+Matematika pre SŠ;2024-05-07;user13;1204;Knihy;Učebnice;169;Pomohlo mi pri maturite, odporúčam!
+Flanelová košeľa;2024-12-19;user9;217;Oblečenie;Košele;92;Elegantná košeľa na každú príležitosť.
+Test z dejepisu – riešenia;2024-12-31;user8;150;Ostatné;Odpovede na najbližší priebežný test;6;Overené riešenia, pomohli mi prejsť!
+Košeľa s dlhým rukávom;2024-08-21;user16;882;Oblečenie;Košele;29;Elegantná košeľa na každú príležitosť.
+Rohový pracovný stôl;2024-10-28;user6;505;Nábytok;Stôl;140;Ideálny na prácu alebo štúdium.
+Biológia 101 odpovede;2024-10-17;user12;3166;Ostatné;Odpovede na najbližší priebežný test;101;Overené riešenia, pomohli mi prejsť!
+LG 4K Monitor;2025-04-04;user17;2171;PC;Monitor;256;Skvelé farby, bez poškodenia.
+Sto rokov samoty;2024-11-23;user10;4439;Knihy;Román;299;Skvelé čítanie na dlhé večery.
+Stôl do obývačky;2025-01-13;user20;1267;Nábytok;Stôl;171;Ideálny na prácu alebo štúdium.
+Ikea Markus;2025-01-24;user17;2006;Nábytok;Stoličky;156;Pohodlná a pevná stolička, vhodná do každej miestnosti.
+Letná sukňa;2025-03-03;user8;3499;Oblečenie;Sukne;137;Elegantný kúsok do práce aj na večeru.
+Autonabíjačka Xiaomi;2024-06-25;user5;1171;Auto;Príslušenstvo;246;Takmer nové, veľmi málo používané.
+Diktáty pre 9. ročník;2024-12-22;user4;3690;Knihy;Učebnice;13;Vhodné pre študentov, výborný stav.
+Písací stôl biely;2024-07-28;user11;3410;Nábytok;Stôl;284;Ideálny na prácu alebo štúdium.
+Posteľ s úložným priestorom;2024-05-19;user5;4677;Nábytok;Posteľ;121;Perfektný stav, len osobný odber.
+Držiak na mobil do auta;2024-10-01;user2;958;Auto;Príslušenstvo;141;Praktický doplnok pre každé vozidlo.
+Proti systému!;2025-01-23;user13;738;Knihy;Pamflet;247;Ostrá kritika spoločnosti, vhodné pre náročných čitateľov.
+Bavlnené tričko;2024-12-18;user3;2579;Oblečenie;Tričká;104;Moderný dizajn a príjemný materiál.
+Diktáty pre 9. ročník;2024-10-18;user19;3434;Knihy;Učebnice;251;Pomohlo mi pri maturite, odporúčam!
+Čierne elegantné nohavice;2024-11-05;user4;3401;Oblečenie;Nohavice;224;Pohodlné nohavice vhodné na každodenné nosenie.
+Test z dejepisu – riešenia;2024-09-08;user10;4577;Ostatné;Odpovede na najbližší priebežný test;24;Zbierka riešení na poslednú chvíľu.
+Nepomenovateľný predmet;2025-04-05;user18;3375;Ostatné;Nezaradené;187;Ťažko opísať, treba vidieť.
+Rozkladacia pohovka;2024-11-07;user4;127;Nábytok;Posteľ;38;Pohodlná posteľ s kvalitným matracom.
+Fyzika – základné poznatky;2025-03-12;user5;4560;Knihy;Učebnice;191;Pomohlo mi pri maturite, odporúčam!
+Volkswagen Passat B6;2024-11-06;user8;4420;Auto;Rodinné auto;262;Bez nehôd, ideálne na výlety.
+LG 4K Monitor;2024-11-05;user7;636;PC;Monitor;207;Kvalitný obraz, ideálny na prácu z domu.
+Peugeot 308 Family;2025-04-17;user18;4269;Auto;Rodinné auto;69;Bez nehôd, ideálne na výlety.
+Nike Dri-Fit;2025-04-06;user4;3136;Oblečenie;Tričká;242;Moderný dizajn a príjemný materiál.
+Čierne elegantné nohavice;2025-01-11;user18;337;Oblečenie;Nohavice;297;Málo nosené, výborný stav.
+Plastový model bomby;2024-07-25;user15;3750;Ostatné;Jadrové hlavice;169;Dekoračný model, nie ostrý.
+Mazda MX-5;2024-10-15;user6;3989;Auto;Športové auto;71;Rýchle a spoľahlivé, skvelý zážitok z jazdy.
+Technológia a otroctvo;2024-08-23;user14;4652;Knihy;Pamflet;300;Zaujímavý pohľad na súčasnosť.
+Sto rokov samoty;2025-03-27;user4;2054;Knihy;Román;40;Skvelé čítanie na dlhé večery.
+Matematika A – správne výsledky;2025-03-07;user6;3501;Ostatné;Odpovede na najbližší priebežný test;58;Zbierka riešení na poslednú chvíľu.
+1984 – Orwell;2024-07-21;user19;3452;Knihy;Román;160;Skvelé čítanie na dlhé večery.
+Čierne elegantné nohavice;2025-03-12;user17;1752;Oblečenie;Nohavice;121;Pohodlné nohavice vhodné na každodenné nosenie.
+Flanelová košeľa;2025-03-05;user9;1385;Oblečenie;Košele;25;Elegantná košeľa na každú príležitosť.
+Držiak na mobil do auta;2024-04-22;user14;2662;Auto;Príslušenstvo;118;Takmer nové, veľmi málo používané.
+Test z dejepisu – riešenia;2024-07-25;user15;4033;Ostatné;Odpovede na najbližší priebežný test;132;Zbierka riešení na poslednú chvíľu.
+CS:GO Prime;2025-01-15;user8;4918;PC;Hry;87;Populárna hra, zaručená zábava.
+LG 4K Monitor;2024-09-19;user16;2415;PC;Monitor;283;Kvalitný obraz, ideálny na prácu z domu.
+Kancelársky počítač Dell;2024-06-06;user11;528;PC;Desktop;261;Stabilný systém, pripravený na okamžité použitie.
+Darček pre všetkých;2024-12-06;user2;1193;Ostatné;Nezaradené;111;Zaujímavý predmet na diskusiu.
+Volkswagen Passat B6;2024-04-26;user19;4130;Auto;Rodinné auto;248;Bez nehôd, ideálne na výlety.
+HP Pavilion 15;2025-03-28;user18;616;PC;Notebook;39;Výborný stav, vhodný na prácu aj štúdium.
+Peugeot 308 Family;2024-07-12;user7;1469;Auto;Rodinné auto;276;Bez nehôd, ideálne na výlety.
+Biológia 101 odpovede;2024-10-30;user6;2840;Ostatné;Odpovede na najbližší priebežný test;146;Overené riešenia, pomohli mi prejsť!
+Drevená posteľ 140x200;2025-01-04;user20;25;Nábytok;Posteľ;130;Pohodlná posteľ s kvalitným matracom.
+Písací stôl biely;2024-08-02;user14;4499;Nábytok;Stôl;136;Moderný dizajn, pevná konštrukcia.
+Nepomenovateľný predmet;2024-05-01;user20;4439;Ostatné;Nezaradené;89;Zaujímavý predmet na diskusiu.
+Džínsy Levi’s;2025-02-23;user2;4993;Oblečenie;Nohavice;46;Málo nosené, výborný stav.
+Herná stolička Razer;2024-10-21;user10;941;Nábytok;Stoličky;231;Pohodlná a pevná stolička, vhodná do každej miestnosti.
+Nepomenovateľný predmet;2024-07-29;user15;4535;Ostatné;Nezaradené;298;Ťažko opísať, treba vidieť.
+Nepomenovateľný predmet;2025-01-22;user9;63;Ostatné;Nezaradené;45;Zaujímavý predmet na diskusiu.
+Herný PC Ryzen 7;2024-05-27;user11;4772;PC;Desktop;297;Výkonný stolný počítač na hry aj prácu.
+Samsung Curved 27;2024-07-24;user20;1892;PC;Monitor;136;Kvalitný obraz, ideálny na prácu z domu.
+Plastový model bomby;2024-10-26;user5;2081;Ostatné;Jadrové hlavice;258;Dekoračný model, nie ostrý.
+Džínsy Levi’s;2025-03-04;user3;4956;Oblečenie;Nohavice;186;Pohodlné nohavice vhodné na každodenné nosenie.
+Audi TT Coupe;2024-06-03;user7;2482;Auto;Športové auto;132;Rýchle a spoľahlivé, skvelý zážitok z jazdy.

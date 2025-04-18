@@ -26,7 +26,7 @@ class Inzeraty(tk.Tk):
         self.create_widgets()
 
         # List Adverts
-        self.update_adverts()
+        self.search_adverts()
 
         self.right_side_created = False
         self.active_user = None
@@ -84,7 +84,7 @@ class Inzeraty(tk.Tk):
         self.category_menu = ttk.Combobox(search_frame, textvariable=self.category_var, values=['All'], state='readonly')
         self.category_menu.current(0)
         self.category_menu.pack(side=tk.LEFT)
-        self.category_menu.bind('<<ComboboxSelected>>', lambda e: self.update_adverts())
+        self.category_menu.bind('<<ComboboxSelected>>', lambda e: self.search_adverts())
 
         search_button = ttk.Button(search_frame, text="Search",command=self.search_button_pressed)
         search_button.pack(side=tk.LEFT,padx=5)
@@ -169,8 +169,7 @@ class Inzeraty(tk.Tk):
 
 
     def search_button_pressed(self):
-        search_str = self.search_var.get()
-        print(search_str)
+        self.search_adverts()
 
     def login_button_pressed(self):
         if self.active_user is None:
@@ -265,7 +264,7 @@ class Inzeraty(tk.Tk):
             self.category_menu["values"] = ["All"] + self.sections[section]
             self.category_menu.current(0)
 
-        self.update_adverts()
+        self.search_adverts()
 
     def show_my_adverts(self):
         if self.active_user is None:
@@ -285,25 +284,25 @@ class Inzeraty(tk.Tk):
             self.update_listbox(self.fetched_adverts)
 
     #does the query
-    def update_adverts(self):
+    def search_adverts(self):
         search = self.search_var.get().lower()
         section = self.section_var.get()
         category = self.category_var.get()
 
         if section == "All":
-            query_str = "SELECT id, title FROM Adverts ORDER BY likes DESC;"
+            query_str = "SELECT id, title FROM Adverts WHERE title LIKE '%' || ? || '%' ORDER BY likes DESC;"
         else:
             if category == "All":
-                query_str = "SELECT id, title FROM Adverts WHERE section = '"+section+"' ORDER BY likes DESC;"
+                query_str = "SELECT id, title FROM Adverts WHERE section = '"+section+"' AND title LIKE '%' || ? || '%' ORDER BY likes DESC;"
             else:
-                query_str = "SELECT id, title FROM Adverts WHERE category = '"+category+"' ORDER BY likes DESC;"
+                query_str = "SELECT id, title FROM Adverts WHERE category = '"+category+"' AND title LIKE '%' || ? || '%' ORDER BY likes DESC;"
 
 
         # Get Adverts
         with sqlite3.connect('database.db') as connection:
             cursor = connection.cursor()
 
-            cursor.execute(query_str)
+            cursor.execute(query_str,(search,))
             self.fetched_adverts = cursor.fetchmany(30) #EDIT HERE HOW MANY TO FETCH
 
         # print(fetched_adverts)
