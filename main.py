@@ -14,7 +14,6 @@ class Inzeraty:
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
                 name TEXT NOT NULL,
                 username TEXT NOT NULL,
-                age INTEGER,
                 email TEXT,
                 phone INTEGER,
                 password TEXT
@@ -58,23 +57,39 @@ class Inzeraty:
         
         pass
 
-            
-
-
-
-    def add_user(self,name,age,email,phone,password,username=None):
+    
+    def create_user(self,name,email,phone,password,username=None):
         #check for conditions
+
+        #name
+        if type(name) != str or len(name)<1:
+            return "Invalid name"
+        
+
+        #email
         if "@" not in email:
-            return "email"
+            return "Invalid email"
         
+        #phone
+        #TODO
         
-        if username is None:
-            username = "_".join(name.lower().split(" "))    
-            print(username)
+        #password
+        if type(password) != str or len(password)<8:
+            return "Invalid password. Password must contain at least 8 characters"
         
         #hash password
         hashed = self.passsword_hash(password)
+
+        #create username
+        if username is None:
+            username = "_".join(name.lower().split(" "))
         
+        #insert into database
+        result = self.insert_user(name,email,phone,hashed,username)
+        return result
+
+
+    def insert_user(self,name,email,phone,password,username):
 
         try:
 
@@ -84,11 +99,11 @@ class Inzeraty:
 
                 # Insert a record into the Students table
                 insert_query = '''
-                INSERT INTO Users (name, username, age, email, phone, password) 
-                VALUES (?, ?, ?, ?, ?, ?);
+                INSERT INTO Users (name, username, email, phone, password) 
+                VALUES (?, ?, ?, ?, ?);
                 '''
 
-                cursor.execute(insert_query, (name,username,age,email,phone,hashed))
+                cursor.execute(insert_query, (name,username,email,phone,password))
 
                 # Commit the changes automatically
                 connection.commit()
@@ -101,23 +116,33 @@ class Inzeraty:
     
     def passsword_hash(self, password):
         return hashlib.sha256(password.encode()).hexdigest()
-
-    def add_advert(self,title,date_created, user, price, section, category):
+    
+    def create_advert(self,title,date_created, user, price, section, category,text):
         #check for conditions
+        
+        #title
         if type(title) != str or len(title) <1:
             return "Invalid title."
         
+        #section
         if section not in self.sections.keys():
             section = "Ostatné"
         
+        #category
         if category not in self.sections[section]:
             category = "Ostatné"
         
+        #price
         if type(price) != int:
             return "Invalid price"
         elif price <0:
             return "Price cannot be negative"
-        
+
+        #insert advert
+        result = self.insert_advert(title,date_created,user,price,section,category)
+
+    def insert_advert(self,title,date_created, user, price, section, category):
+
         try:
             with sqlite3.connect('database.db') as connection:
                 cursor = connection.cursor()
@@ -141,5 +166,5 @@ class Inzeraty:
 
 
 i = Inzeraty()
-# i.add_user("Milan Lasica",23,"lasica@skibidi.sk",273982791,"skibidi123")
-print(i.add_advert("Test",datetime.datetime(2009, 5, 5),"milan_lasica",999,"Ostatné","Jadrové hlavice"))
+print(i.create_user("admin","admin@admin",0,"adminadmin"))
+# print(i.add_advert("Test",datetime.datetime(2009, 5, 5),"milan_lasica",999,"Ostatné","Jadrové hlavice"))
