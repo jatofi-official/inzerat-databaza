@@ -43,6 +43,12 @@ class Inzeraty(tk.Tk):
         top_frame = ttk.Frame(main_frame)
         top_frame.grid(row=0, column=0, sticky="ew", pady=5)
 
+        add_advert_button = ttk.Button(top_frame,text="Add advert",command=self.new_advert_pressed)
+        add_advert_button.pack(side=tk.LEFT,padx=5)
+
+        user_adverts_button = ttk.Button(top_frame,text="Show my adverts",command=self.show_my_adverts)
+        user_adverts_button.pack(side=tk.LEFT,padx=5)
+
         self.register_button = ttk.Button(top_frame, text="Register",command=self.register_button_pressed)
         self.register_button.pack(side=tk.RIGHT, padx=5)
 
@@ -79,6 +85,9 @@ class Inzeraty(tk.Tk):
         self.category_menu.current(0)
         self.category_menu.pack(side=tk.LEFT)
         self.category_menu.bind('<<ComboboxSelected>>', lambda e: self.update_adverts())
+
+        search_button = ttk.Button(search_frame, text="Search",command=self.search_button_pressed)
+        search_button.pack(side=tk.LEFT,padx=5)
 
         # BOTOTM FRAME
         self.bottom_frame = ttk.Frame(main_frame)
@@ -159,6 +168,9 @@ class Inzeraty(tk.Tk):
         self.advert_delete_button.pack(fill="x")
 
 
+    def search_button_pressed(self):
+        search_str = self.search_var.get()
+        print(search_str)
 
     def login_button_pressed(self):
         if self.active_user is None:
@@ -214,7 +226,7 @@ class Inzeraty(tk.Tk):
             print("register")
         else:
             print("settings")
-
+    
 
     def log_in(self,result):
         self.user_label.config(text=result[1])
@@ -255,6 +267,22 @@ class Inzeraty(tk.Tk):
 
         self.update_adverts()
 
+    def show_my_adverts(self):
+        if self.active_user is None:
+            messagebox.showwarning("Not logged in","You are not logged in")
+        else:
+            query_str = "SELECT id,title FROM Adverts WHERE user='"+self.active_user+"' ORDER BY likes DESC;"
+            # Get Adverts
+            with sqlite3.connect('database.db') as connection:
+                cursor = connection.cursor()
+
+                cursor.execute(query_str)
+                self.fetched_adverts = cursor.fetchmany(30) #EDIT HERE HOW MANY TO FETCH
+
+            # print(fetched_adverts)
+            
+
+            self.update_listbox(self.fetched_adverts)
 
     #does the query
     def update_adverts(self):
@@ -276,7 +304,7 @@ class Inzeraty(tk.Tk):
             cursor = connection.cursor()
 
             cursor.execute(query_str)
-            self.fetched_adverts = cursor.fetchmany(25) #EDIT HERE HOW MANY TO FETCH
+            self.fetched_adverts = cursor.fetchmany(30) #EDIT HERE HOW MANY TO FETCH
 
         # print(fetched_adverts)
         
@@ -327,6 +355,13 @@ class Inzeraty(tk.Tk):
             obsah = subor.read().decode()
             # print(type(obsah))
             return obsah
+
+    #TODO
+    def new_advert_pressed(self):
+        if self.active_user is None:
+            messagebox.showwarning("Not logged in","You need to be logged in to create adverts!")
+        else:
+            pass
 
     def create_tables(self):
         with sqlite3.connect('database.db') as connection:
@@ -588,7 +623,7 @@ class Inzeraty(tk.Tk):
 if __name__ == '__main__':
     i = Inzeraty()
     # i.insert_user("admin","",0,i.passsword_hash("admin"),"admin")
+    # i.create_advert("I want to sell my PC",datetime.date.today(),"admin",9999,"PC","Desktop","This is my very special pc, I built it lorem ipsum lorem ipsum")
     
     i.mainloop()
     
-    # i.fill_random(0,20)
