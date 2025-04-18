@@ -1,14 +1,18 @@
 import sqlite3
-import pandas as pd
 
-# Use 'with' to connect to the SQLite database
-with sqlite3.connect('my_database.db') as connection:
-    # Write the SQL command to select all records from the Students table
-    select_query = "SELECT * FROM Students;"
+database = "my.db"
+create_table = """CREATE TABLE IF NOT EXISTS projects (
+    id INTEGER PRIMARY KEY, 
+    name text NOT NULL, 
+    begin_date DATE, 
+    end_date DATE
+);"""
 
-    # Use pandas to read SQL query directly into a DataFrame
-    df = pd.read_sql_query(select_query, connection)
+try:
+    with sqlite3.connect(database) as conn:
+        cursor = conn.cursor()
+        cursor.execute(create_table)   
+        conn.commit()
 
-# Display the DataFrame
-print("All Students as DataFrame:")
-print(df)
+except sqlite3.OperationalError as e:
+    print(e)
