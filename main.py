@@ -2,10 +2,105 @@ import sqlite3
 import hashlib
 import datetime
 import random
+import tkinter as tk
+from tkinter import ttk, messagebox
+import faker
 
-class Inzeraty:
+
+class Inzeraty(tk.Tk):
     def __init__(self):
-        #create both tables
+        #initialise window
+        super().__init__()
+        self.title("Adverts")
+        self.geometry("800x600")
+
+
+        #Load sections and categories
+        self.load_sections()
+
+
+        #Create both tables
+        self.create_tables()
+
+        #Create widhets
+        self.create_widgets()
+
+
+
+
+    def create_widgets(self):
+        # TOP FRAME 
+
+        top_frame = ttk.Frame(self)
+        top_frame.pack(fill=tk.X, pady=5)
+
+        register_button = ttk.Button(top_frame, text="Register")
+        register_button.pack(side=tk.RIGHT,padx=5)
+
+        login_button = ttk.Button(top_frame, text="Login")
+        login_button.pack(side=tk.RIGHT, padx=5)
+
+        self.user_label = ttk.Label(top_frame, text="Not logged in")
+        self.user_label.pack(side=tk.RIGHT, padx=5)
+
+
+        # SEARCH FRAME
+
+        search_frame = ttk.Frame(self)
+        search_frame.pack(fill=tk.X, pady=(10,5))
+
+        # Search entry
+        ttk.Label(search_frame, text="Search:").pack(side=tk.LEFT,padx=5)
+        self.search_var = tk.StringVar()
+
+        self.search_var = tk.StringVar()
+        search_entry = ttk.Entry(search_frame,textvariable=self.search_var)
+        search_entry.pack(side=tk.LEFT,padx=5)
+        # search_entry = ttk.Entry(search_frame, textvariable=self.search_var)
+
+        # Sections
+        ttk.Label(search_frame, text="Section:").pack(side=tk.LEFT,padx=(6,0))
+        self.section_var = tk.StringVar()
+
+        self.section_menu = ttk.Combobox(search_frame, textvariable=self.section_var, values=['All'] + [key for key in self.sections.keys()], state='readonly')
+        self.section_menu.current(0)
+        self.section_menu.pack(side=tk.LEFT)
+        self.section_menu.bind('<<ComboboxSelected>>', lambda e: self.update_categories())
+
+        # Categories
+        ttk.Label(search_frame, text="Category:").pack(side=tk.LEFT,padx=(6,0))
+        self.category_var = tk.StringVar()
+
+        self.category_menu = ttk.Combobox(search_frame, textvariable=self.category_var, values=['All'], state='readonly')
+        self.category_menu.current(0)
+        self.category_menu.pack(side=tk.LEFT)
+        # category_menu.bind('<<ComboboxSelected>>', lambda e: self.update_list())
+
+        # BOTTOM FRAME
+        bottom_frame = ttk.Frame(self)
+        bottom_frame.pack(fill=tk.X,padx=5,pady=5)
+
+        left_frame = tk.Frame(bottom_frame, bg="red")
+        right_frame = tk.Frame(bottom_frame, bg="blue")
+
+        left_frame.pack(side=tk.LEFT, expand=True, fill=tk.BOTH)
+        right_frame.pack(side=tk.LEFT, expand=True, fill=tk.BOTH)
+
+        self.listbox = tk.Listbox(left_frame)
+        self.listbox.pack(fill=tk.BOTH, expand=True)
+        
+        
+
+    
+    def update_categories(self):
+        section = self.section_var.get()
+        
+        print(section)
+        self.category_menu["values"] = self.sections[section]
+        self.category_menu.current(0)
+
+
+    def create_tables(self):
         with sqlite3.connect('database.db') as connection:
             cursor = connection.cursor()
 
@@ -39,10 +134,8 @@ class Inzeraty:
             # Commit the changes
             connection.commit()
 
-
-        #Load sections and categories
+    def load_sections(self):
         self.sections = dict()
-
         with open("sections_categories.txt") as subor:
             riadky = subor.read().split("\n")
             categories = riadky[1].split(";")
@@ -56,8 +149,6 @@ class Inzeraty:
 
                 i+= 1
         
-        pass
-
     
     def create_user(self,name,email,phone,password,username=None):
         #check for conditions
@@ -163,11 +254,14 @@ class Inzeraty:
         
         #create advert text file 
         if result:
-            nazov = self.title_hash(title)
-            with open("Adverts/"+nazov+".dat","wb") as subor:
-                byte_text = text.encode()
-                subor.write(byte_text)
+            self.create_advert_file(title,text)
             
+
+    def create_advert_file(self,title,text):
+        nazov = self.title_hash(title)
+        with open("Adverts/"+nazov+".dat","wb") as subor:
+            byte_text = text.encode()
+            subor.write(byte_text)
 
     def insert_advert(self,title,date_created, user, price, section, category):
 
@@ -196,6 +290,71 @@ class Inzeraty:
         return hashlib.md5(title.encode()).hexdigest()
 
 
-i = Inzeraty()
-# print(i.create_user("admin","admin@admin",0,"adminadmin","admin8"))
-# i.create_advert("Test",datetime.datetime(2009, 5, 5),"admin",999,"Ostatné","Jadrové hlavice","skibiditextaôldsfôlsadfjs")
+    def fill_random(self,num_users=0, num_adverts=0):
+        fake = faker.Faker()
+
+        with sqlite3.connect('database.db') as connection:
+            cursor = connection.cursor()
+
+            # Generate users
+            users = []
+            for i in range(num_users):
+                name = fake.name()
+                username = "_".join(name.lower().split(" "))+str(random.randint(0,10))
+                email = "_".join(name.lower().split(" "))+str(random.randint(0,10)) + "@example.com"
+                phone = fake.random_int(min=1000000000, max=9999999999)
+                # password = "_".join(fake.words(2)) + str(random.randint(0,99))
+                password = self.passsword_hash(fake.word())
+                users.append((name, username,email, phone, password))
+
+            # Insert Users
+            cursor.executemany('''
+            INSERT INTO Users (name, username, email, phone, password)
+            VALUES (?, ?, ?, ?, ?);''', users)
+            
+
+            # Generate adverts
+
+            # get usernames
+            cursor.execute('SELECT username FROM Users')
+            usernames = [row[0] for row in cursor.fetchall()]
+
+
+            adverts = []
+            for i in range(num_adverts):
+
+
+                date_created = fake.date_between(start_date='-1y', end_date='today')
+                user = random.choice(usernames)
+                price = random.randint(10, 1000)
+
+                title = "Selling " + fake.word() + " for " +str(price) + " €"
+                
+                section = random.choice(list(self.sections.keys()))
+                category = random.choice(self.sections[section])
+                adverts.append((title, date_created, user, price, section, category))
+
+                text = ""
+                for sentence in fake.sentences(random.randint(5,11)):
+                    text += sentence + " "
+                # print(text)
+
+                self.create_advert_file(title,text)
+
+            # print(*adverts,sep="\n")
+
+            
+            # Insert Adverts
+
+            cursor.executemany('''
+            INSERT INTO Adverts (title, date_created, user, price, section, category)
+            VALUES (?, ?, ?, ?, ?, ?);''', adverts)
+
+            connection.commit()
+
+
+if __name__ == '__main__':
+    i = Inzeraty()
+    # i.mainloop()
+    # print(i.create_user("admin","admin@admin",0,"adminadmin","admin8"))
+    # i.create_advert("Test",datetime.datetime(2009, 5, 5),"admin",999,"Ostatné","Jadrové hlavice","skibiditextaôldsfôlsadfjs")
