@@ -5,6 +5,7 @@ import random
 import tkinter as tk
 from tkinter import ttk, messagebox
 import faker
+import os
 
 
 class Inzeraty(tk.Tk):
@@ -38,7 +39,6 @@ class Inzeraty(tk.Tk):
         main_frame.pack(fill=tk.BOTH, expand=True)
 
         # MAIN FRAME
-        main_frame.rowconfigure(2, weight=1)
         main_frame.columnconfigure(0, weight=1)
 
         # TOP FRAME
@@ -91,11 +91,32 @@ class Inzeraty(tk.Tk):
         search_button = ttk.Button(search_frame, text="Search",command=self.search_button_pressed)
         search_button.pack(side=tk.LEFT,padx=5)
 
+        # ADVANCED SEARCH FRAME
+        advanced_search_frame = ttk.Frame(main_frame)
+        advanced_search_frame.grid(row=2, column=0, sticky="ew", pady=(2,5))
+
+        ttk.Label(advanced_search_frame, text="Price:").pack(side=tk.LEFT, padx=5)
+
+
+        ttk.Label(advanced_search_frame, text="min").pack(side=tk.LEFT, padx=2)
+
+        self.min_var = tk.StringVar()
+        min_price_entry = ttk.Entry(advanced_search_frame, textvariable=self.min_var,width=5)
+        min_price_entry.pack(side=tk.LEFT)
+
+        ttk.Label(advanced_search_frame, text="max").pack(side=tk.LEFT, padx=(5,2))
+
+        self.max_var = tk.StringVar()
+        max_price_entry = ttk.Entry(advanced_search_frame, textvariable=self.max_var,width=5)
+        max_price_entry.pack(side=tk.LEFT)
+
+
+
         # BOTOTM FRAME
         self.bottom_frame = ttk.Frame(main_frame)
-        self.bottom_frame.grid(row=2, column=0, sticky="nsew", padx=5, pady=5)
+        self.bottom_frame.grid(row=3, column=0, sticky="nsew", padx=5, pady=5)
 
-        main_frame.rowconfigure(2, weight=1)
+        main_frame.rowconfigure(3, weight=1)
 
         # Proporitons here:
         self.bottom_frame.columnconfigure(0, weight=2, uniform="half")
@@ -115,60 +136,94 @@ class Inzeraty(tk.Tk):
 
     def create_right_side(self):
         # RIGHT FRAME
-        right_frame = tk.Frame(self.bottom_frame)
-        right_frame.grid(row=0, column=1, sticky="nsew")
+        self.right_frame = tk.Frame(self.bottom_frame)
+        self.right_frame.grid(row=0, column=1, sticky="nsew")
 
         # Right content 
         # TOP FRAME
-        advert_top_frame = ttk.Frame(right_frame)
-        advert_top_frame.pack(fill=tk.X)
+        self.advert_top_frame = ttk.Frame(self.right_frame)
+        self.advert_top_frame.pack(fill=tk.X)
 
-        advert_top_frame.columnconfigure(0, weight=1)
-        advert_top_frame.columnconfigure(1, weight=0)
+        self.advert_top_frame.columnconfigure(0, weight=1)
+        self.advert_top_frame.columnconfigure(1, weight=0)
 
-        self.advert_title = ttk.Label(advert_top_frame,text="",font=("Arial", 16, "bold"),anchor="w")
+        self.advert_title = ttk.Label(self.advert_top_frame,text="",font=("Arial", 16, "bold"),anchor="w")
         self.advert_title.grid(row=0, column=0, sticky="w", padx=5)
 
-        self.advert_like_count = ttk.Label(advert_top_frame,text="",anchor="e")
+        self.advert_like_count = ttk.Label(self.advert_top_frame,text="",anchor="e")
         self.advert_like_count.grid(row=0, column=1, sticky="e", padx=5)
 
         # Middle text
-        self.advert_text_field = tk.Text(right_frame)
+        self.advert_text_field = tk.Text(self.right_frame)
         self.advert_text_field.pack(fill=tk.X)
         self.advert_text_field.insert(tk.END,"")
         self.advert_text_field.config(state=tk.DISABLED)
 
         # BOTTOM FRAME
-        advert_bottom_frame = ttk.Frame(right_frame)
-        advert_bottom_frame.pack(fill=tk.X)
-        advert_bottom_frame.columnconfigure(0,weight=1)
+        self.advert_bottom_frame = ttk.Frame(self.right_frame)
+        self.advert_bottom_frame.pack(fill=tk.X)
+        self.advert_bottom_frame.columnconfigure(0,weight=1)
 
         #user
-        self.advert_user = ttk.Label(advert_bottom_frame,text="",anchor="w")
+        self.advert_user = ttk.Label(self.advert_bottom_frame,text="",anchor="w")
         self.advert_user.grid(row=0, column=0, sticky="w", padx=5)
         # email
-        self.advert_mail = ttk.Label(advert_bottom_frame,text="",anchor="w")
+        self.advert_mail = ttk.Label(self.advert_bottom_frame,text="",anchor="w")
         self.advert_mail.grid(row=1, column=0, sticky="w", padx=5)
         # phone
-        self.advert_phone = ttk.Label(advert_bottom_frame,text="",anchor="w")
+        self.advert_phone = ttk.Label(self.advert_bottom_frame,text="",anchor="w")
         self.advert_phone.grid(row=2, column=0, sticky="w", padx=5)
         # date
-        self.advert_date = ttk.Label(advert_bottom_frame,text="",anchor="w")
+        self.advert_date = ttk.Label(self.advert_bottom_frame,text="",anchor="w")
         self.advert_date.grid(row=3, column=0, sticky="w", padx=5)
         # like
-        self.advert_like_button = ttk.Button(advert_bottom_frame,text="Like")
+        self.advert_like_button = ttk.Button(self.advert_bottom_frame,text="Like",state=tk.DISABLED)
         self.advert_like_button.grid(row=4, column=0, sticky="w", padx=5)
         
         # edit and delete buttons
-        button_frame = ttk.Frame(advert_bottom_frame)
-        button_frame.grid(row=0, column=1, rowspan=4, sticky="ne", padx=5, pady=5)
+        self.button_frame = ttk.Frame(self.advert_bottom_frame)
+        self.button_frame.grid(row=0, column=1, rowspan=4, sticky="ne", padx=5, pady=5)
 
-        self.advert_edit_button = ttk.Button(button_frame, text="Edit", state=tk.DISABLED,command=self.edit_button_pressed)
+        self.advert_edit_button = ttk.Button(self.button_frame, text="Edit", state=tk.DISABLED,command=self.edit_button_pressed)
         self.advert_edit_button.pack(fill="x", pady=(0,5))
 
-        self.advert_delete_button = ttk.Button(button_frame, text="Delete", state=tk.DISABLED,command=self.delete_button_pressed)
+        self.advert_delete_button = ttk.Button(self.button_frame, text="Delete", state=tk.DISABLED,command=self.delete_button_pressed)
         self.advert_delete_button.pack(fill="x")
 
+    def delete_right_side(self):
+        # RIGHT FRAME
+        self.right_frame.destroy()
+        # Right content 
+        # TOP FRAME
+        self.advert_top_frame.destroy()
+
+        self.advert_title.destroy()
+        self.advert_like_count.destroy()
+        # Middle text
+        self.advert_text_field.destroy()
+        # BOTTOM FRAME
+        self.advert_bottom_frame.destroy()
+        
+        #user
+        self.advert_user.destroy()
+        
+        # email
+        self.advert_mail.destroy()
+        # phone
+        self.advert_phone.destroy()
+        # date
+        self.advert_date.destroy()
+        # like
+        self.advert_like_button.destroy()
+        
+        # edit and delete buttons
+        self.button_frame.destroy()
+
+        self.advert_edit_button.destroy()
+
+        self.advert_delete_button.destroy()
+
+        self.right_side_created = False
 
 
     def delete_button_pressed(self):
@@ -188,9 +243,22 @@ class Inzeraty(tk.Tk):
                     #Hide active advert 
                     self.active_advert_id = None
 
-                    #TODO here
+                    
 
 
+                    # Delete file
+                    filename = self.title_hash(self.advert_title["text"])
+                    
+                    try:
+                        os.remove("Adverts/"+filename+".dat")
+                    except Exception as e:
+                        print(e)
+
+                    #hide active advert text
+                    self.delete_right_side()
+
+                    #update search query
+                    self.search_adverts()
 
                 except:
                     print("Error deleting advert id:",self.active_advert_id)
@@ -253,16 +321,98 @@ class Inzeraty(tk.Tk):
     #TODO     
     def register_button_pressed(self):
         if self.active_user is None:
-            print("register")
+            win = tk.Toplevel(self)
+            
+            win.title("Register")
+            win.geometry("300x400")
+
+            win.resizable(False, False)
+
+            self.error_message = ttk.Label(win, text="Enter personal details below:",anchor="w")
+            self.error_message.grid(row=0, column=0, columnspan=2, pady=10)
+
+            
+            ttk.Label(win, text="Full name:").grid(row=1, column=0, pady=5, padx=5, sticky="e")
+            name_entry = ttk.Entry(win)
+            name_entry.grid(row=1, column=1, pady=5, padx=5)
+
+            ttk.Label(win, text="Email:").grid(row=2, column=0, pady=5, padx=5, sticky="e")
+            email_entry = ttk.Entry(win)
+            email_entry.grid(row=2, column=1, pady=5, padx=5)
+
+            ttk.Label(win, text="Phone (optional):").grid(row=3, column=0, pady=5, padx=5, sticky="e")
+            phone_entry = ttk.Entry(win)
+            phone_entry.grid(row=3, column=1, pady=5, padx=5)
+
+            ttk.Label(win, text="Password:").grid(row=4, column=0, pady=5, padx=5, sticky="e")
+            password_entry = ttk.Entry(win, show="*")
+            password_entry.grid(row=4, column=1, pady=5, padx=5)
+
+            ttk.Label(win, text="Username (optional):").grid(row=5, column=0, pady=5, padx=5, sticky="e")
+            username_entry = ttk.Entry(win)
+            username_entry.grid(row=5, column=1, pady=5, padx=5)
+
+            def register_action():
+                typed_name = name_entry.get()
+                typed_email = email_entry.get()
+                typed_phone = phone_entry.get()
+                username = username_entry.get()  
+                typed_password = password_entry.get()
+
+                if username == "":
+                    
+                    username = "_".join(typed_name.lower().split(" "))+str(random.randint(0,1000))
+
+                    while not self.check_valid_username(username):
+                        if username is None:
+                            username = "_".join(typed_name.lower().split(" "))+str(random.randint(0,1000))
+                else:
+                    if not self.check_valid_username(username):
+                        self.error_message.config(text="Username already exists")
+                        return "Username already exists"
+
+                result = self.create_user(typed_name,typed_email,typed_phone,typed_password,username)
+                if result is not True:
+                    self.error_message.config(text=result)
+                # check validity:
+                # hashed = self.passsword_hash(typed_password)
+
+                # Check login information                
+                # query_str = "SELECT * FROM Users WHERE username = ? AND password = ?"
+                # with sqlite3.connect('database.db') as connection:
+                #     cursor = connection.cursor()
+                #     query_str = "SELECT * FROM Users WHERE username = ? AND password = ?"
+                #     cursor.execute(query_str, (typed_username, hashed))
+                #     result = cursor.fetchone()
+
+
+                else:  # SUCCESSFUL LOGIN
+                    if username_entry.get() =="":
+                        messagebox.showinfo("New Username","Your automatically generated username is:\n"+username)
+                    self.log_in([0,typed_name,username])
+                    win.destroy()
+
+            # Login button
+            ttk.Button(win, text="Login", command=register_action).grid(row=6, column=0, columnspan=2, pady=10)
+        
         else:
-            print("settings")
+            print("Delete user")
     
 
     def log_in(self,result):
         self.user_label.config(text=result[1])
         self.login_button.config(text="Log out")
-        self.register_button.config(text="Settings")
+        self.register_button.config(text="Delete user")
         self.active_user = result[2]
+
+        #update current advert
+        if self.right_side_created:
+            if self.advert_user["text"]== "User: "+self.active_user:
+                self.advert_edit_button.config(state=tk.NORMAL)
+                self.advert_delete_button.config(state=tk.NORMAL)
+            self.advert_like_button.config(state=tk.NORMAL)
+
+
         # print(result[2])
     
     def log_out(self):
@@ -271,6 +421,15 @@ class Inzeraty(tk.Tk):
             self.user_label.config(text="Not logged in")
             self.login_button.config(text="Login")
             self.register_button.config(text="Register")
+
+            #update current advert
+            if self.right_side_created:
+                if self.advert_user["text"]== "User: "+self.active_user:
+                    self.advert_edit_button.config(state=tk.DISABLED)
+                    self.advert_delete_button.config(state=tk.DISABLED)
+                self.advert_like_button.config(state=tk.DISABLED)
+
+            
             self.active_user = None
 
     #When list item is selected
@@ -321,6 +480,16 @@ class Inzeraty(tk.Tk):
         search = self.search_var.get().lower()
         section = self.section_var.get()
         category = self.category_var.get()
+        
+        try:    
+            min_price = int(self.min_var.get())
+        except:
+            min_price = 0
+        
+        try:
+            max_price = int(self.max_var.get())
+        except:
+            max_price = None
 
         if section == "All":
             query_str = "SELECT id, title FROM Adverts WHERE title LIKE '%' || ? || '%' ORDER BY likes DESC;"
@@ -382,18 +551,20 @@ class Inzeraty(tk.Tk):
         
         # date
         self.advert_date.config(text="Posted on: "+str(advert_result[2]))
-        
-        
 
-        # check is active user is the same as creator
-        if self.active_user == advert_result[3]:
-            self.advert_edit_button.config(state=tk.NORMAL)
-            self.advert_delete_button.config(state=tk.NORMAL)
-            self.active_advert_id = advert_id
-        else:
-            self.advert_edit_button.config(state=tk.DISABLED)
-            self.advert_delete_button.config(state=tk.DISABLED) 
-            self.active_advert_id = None
+        #check if user is logged in
+        if self.active_user is not None:
+            self.advert_like_button.config(state=tk.NORMAL)            
+
+            # check is active user is the same as creator
+            if self.active_user == advert_result[3]:
+                self.advert_edit_button.config(state=tk.NORMAL)
+                self.advert_delete_button.config(state=tk.NORMAL)
+                self.active_advert_id = advert_id
+            else:
+                self.advert_edit_button.config(state=tk.DISABLED)
+                self.advert_delete_button.config(state=tk.DISABLED) 
+                self.active_advert_id = None
 
 
 
@@ -479,21 +650,12 @@ class Inzeraty(tk.Tk):
         
         #password
         if type(password) != str or len(password)<8:
-            return "Invalid password. Password must contain at least 8 characters"
+            return "Password must contain at least 8 characters"
         
         #hash password
         hashed = self.passsword_hash(password)
 
-        #create username
-        if username is None:
-            username = "_".join(name.lower().split(" "))+str(random.randint(0,1000))
-
-            while not self.check_valid_username(username):
-                if username is None:
-                    username = "_".join(name.lower().split(" "))+str(random.randint(0,1000))
-        else:
-            if not self.check_valid_username(username):
-                return "Username already exists"
+        
 
         
 
@@ -671,7 +833,7 @@ class Inzeraty(tk.Tk):
 if __name__ == '__main__':
     i = Inzeraty()
     # i.insert_user("admin","",0,i.passsword_hash("admin"),"admin")
-    i.create_advert("I want to sell my PC",datetime.date.today(),"admin",9999,"PC","Desktop","This is my very special pc, I built it lorem ipsum lorem ipsum")
+    # i.create_advert("I want to sell my PC",datetime.date.today(),"admin",9999,"PC","Desktop","This is my very special pc, I built it lorem ipsum lorem ipsum")
     
     i.mainloop()
     
