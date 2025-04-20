@@ -95,9 +95,8 @@ class Inzeraty(tk.Tk):
         advanced_search_frame = ttk.Frame(main_frame)
         advanced_search_frame.grid(row=2, column=0, sticky="ew", pady=(2,5))
 
+        # price
         ttk.Label(advanced_search_frame, text="Price:").pack(side=tk.LEFT, padx=5)
-
-
         ttk.Label(advanced_search_frame, text="min").pack(side=tk.LEFT, padx=2)
 
         self.min_var = tk.StringVar()
@@ -109,6 +108,24 @@ class Inzeraty(tk.Tk):
         self.max_var = tk.StringVar()
         max_price_entry = ttk.Entry(advanced_search_frame, textvariable=self.max_var,width=5)
         max_price_entry.pack(side=tk.LEFT)
+
+        # sort by
+        ttk.Label(advanced_search_frame, text="Sort by:").pack(side=tk.LEFT, padx=(6,0))
+        self.sort_by_var = tk.StringVar()
+
+        sort_by_menu = ttk.Combobox(advanced_search_frame, textvariable=self.sort_by_var, values=["Likes","Price","Title","Date"], state='readonly',width=7)
+        sort_by_menu.current(0)
+        sort_by_menu.pack(side=tk.LEFT)
+        sort_by_menu.bind('<<ComboboxSelected>>', lambda e: self.search_adverts())
+
+        #ascending/descentind
+        self.order_by_var = tk.StringVar()
+
+        order_by_menu = ttk.Combobox(advanced_search_frame, textvariable=self.order_by_var, values=["Descending","Ascending"], state='readonly',width=10)
+        order_by_menu.current(0)
+        order_by_menu.pack(side=tk.LEFT,padx=5)
+        order_by_menu.bind('<<ComboboxSelected>>', lambda e: self.search_adverts())
+
 
 
 
@@ -150,8 +167,9 @@ class Inzeraty(tk.Tk):
         self.advert_title = ttk.Label(self.advert_top_frame,text="",font=("Arial", 16, "bold"),anchor="w")
         self.advert_title.grid(row=0, column=0, sticky="w", padx=5)
 
-        self.advert_like_count = ttk.Label(self.advert_top_frame,text="",anchor="e")
-        self.advert_like_count.grid(row=0, column=1, sticky="e", padx=5)
+        self.advert_price = ttk.Label(self.advert_top_frame,text="",anchor="e")
+        self.advert_price.grid(row=0, column=1, sticky="e", padx=5)
+        
 
         # Middle text
         self.advert_text_field = tk.Text(self.right_frame)
@@ -176,9 +194,13 @@ class Inzeraty(tk.Tk):
         # date
         self.advert_date = ttk.Label(self.advert_bottom_frame,text="",anchor="w")
         self.advert_date.grid(row=3, column=0, sticky="w", padx=5)
-        # like
+        # like count
+        self.advert_like_count = ttk.Label(self.advert_bottom_frame,text="asdf",anchor="w")
+        self.advert_like_count.grid(row=4, column=0, sticky="w", padx=5)
+        
+        #like button
         self.advert_like_button = ttk.Button(self.advert_bottom_frame,text="Like",state=tk.DISABLED)
-        self.advert_like_button.grid(row=4, column=0, sticky="w", padx=5)
+        self.advert_like_button.grid(row=4, column=1, sticky="w", padx=5)
         
         # edit and delete buttons
         self.button_frame = ttk.Frame(self.advert_bottom_frame)
@@ -263,7 +285,7 @@ class Inzeraty(tk.Tk):
                 except:
                     print("Error deleting advert id:",self.active_advert_id)
 
-                
+    # TODO 
     def edit_button_pressed(self):
         print("Edit button pressed")
 
@@ -317,14 +339,13 @@ class Inzeraty(tk.Tk):
         
         else:
             self.log_out()
-
-    #TODO     
+  
     def register_button_pressed(self):
         if self.active_user is None:
             win = tk.Toplevel(self)
             
             win.title("Register")
-            win.geometry("300x400")
+            win.geometry("300x240")
 
             win.resizable(False, False)
 
@@ -414,6 +435,7 @@ class Inzeraty(tk.Tk):
 
 
         # print(result[2])
+        self.show_my_adverts()
     
     def log_out(self):
         result = messagebox.askquestion("askquestion", "Do you really want to log out?") 
@@ -481,23 +503,42 @@ class Inzeraty(tk.Tk):
         section = self.section_var.get()
         category = self.category_var.get()
         
+        sort_raw = self.sort_by_var.get()
+
+        sort_by = sort_raw.lower()
+
+        if sort_raw =="Date":
+            sort_by = "date_created"
+
+        order_by = self.order_by_var.get()
+        if order_by == "Descending":
+            order_by = "DESC"
+        else:
+            order_by = "ASC"
+        
         try:    
-            min_price = int(self.min_var.get())
+            min_price = int(self.min_var.get().strip())
         except:
             min_price = 0
         
         try:
-            max_price = int(self.max_var.get())
+            max_price = int(self.max_var.get().strip())
         except:
             max_price = None
 
+        
+        price_str = "AND price BETWEEN "+str(min_price)+" AND "+str(max_price)+" "
+
+        if max_price is None:
+            price_str = "AND price >= "+str(min_price)
+
         if section == "All":
-            query_str = "SELECT id, title FROM Adverts WHERE title LIKE '%' || ? || '%' ORDER BY likes DESC;"
+            query_str = "SELECT id, title FROM Adverts WHERE title LIKE '%' || ? || '%' "+price_str+" ORDER BY "+sort_by+" "+order_by+";"
         else:
             if category == "All":
-                query_str = "SELECT id, title FROM Adverts WHERE section = '"+section+"' AND title LIKE '%' || ? || '%' ORDER BY likes DESC;"
+                query_str = "SELECT id, title FROM Adverts WHERE section = '"+section+"' AND title LIKE '%' || ? || '%' "+price_str+" ORDER BY "+sort_by+" "+order_by+";"
             else:
-                query_str = "SELECT id, title FROM Adverts WHERE category = '"+category+"' AND title LIKE '%' || ? || '%' ORDER BY likes DESC;"
+                query_str = "SELECT id, title FROM Adverts WHERE category = '"+category+"' AND title LIKE '%' || ? || '%' "+price_str+" ORDER BY "+sort_by+" "+order_by+";"
 
 
         # Get Adverts
@@ -534,6 +575,9 @@ class Inzeraty(tk.Tk):
         
         #AFFECT STUFF
         self.advert_title.config(text=advert_result[1])
+
+        self.advert_price.config(text=str(advert_result[4])+" €")
+
         self.advert_like_count.config(text="Likes: "+str(advert_result[7])+"👍")
         
         # text field
@@ -569,20 +613,123 @@ class Inzeraty(tk.Tk):
 
 
     def get_advert_text(self, title):
-        title_hash = self.title_hash(title)
-        with open("Adverts/"+title_hash+".dat","rb") as subor:
-            obsah = subor.read().decode()
-            # print(type(obsah))
-            return obsah
+        try:
+            title_hash = self.title_hash(title)
+            with open("Adverts/"+title_hash+".dat","rb") as subor:
+                obsah = subor.read().decode()
+                # print(type(obsah))
+                return obsah
+        except:
+            messagebox.showerror("Error","Error loading advert text. Check if file exists")
+            return ""
 
-    #TODO
     def new_advert_pressed(self):
         if self.active_user is None:
+        # if False:
             messagebox.showwarning("Not logged in","You need to be logged in to create adverts!")
         else:
-            pass
+            # add the advert
+            win = tk.Toplevel(self)
+            
+            win.title("Add advert")
+            win.geometry("500x600")
+
+            win.resizable(False, False)
+            # Right content 
+            #  ano... dalo by sa to spravit cez grid ale atp i dont care, ked to funguje:)
+            # TITLE FRAME
+            top_frame = ttk.Frame(win)
+            top_frame.pack(fill=tk.X,pady=5)
+            ttk.Label(top_frame,text="Create new advert:",font=("Arial", 14, "bold"),anchor="w").pack(side=tk.LEFT,padx=5,pady=5)
+
+            # MAIN FRAME
+            main_frame = ttk.Frame(win)
+            main_frame.pack(fill=tk.X,pady=5)
+
+            ttk.Label(main_frame,text="Title:").pack(side=tk.LEFT,padx=5)
+            title_var = tk.StringVar()
+            title_entry = ttk.Entry(main_frame, textvariable=title_var,width=40)
+            title_entry.pack(side=tk.LEFT, padx=5)
+
+            ttk.Label(main_frame,text="€").pack(side=tk.RIGHT,padx=5)
+
+            price_var = tk.StringVar()
+            price_entry = ttk.Entry(main_frame, textvariable=price_var,width=10)
+            price_entry.pack(side=tk.RIGHT, padx=(5,2))
+            ttk.Label(main_frame,text="Price:").pack(side=tk.RIGHT,padx=5)
+
+            # CATEGORY FRAME
+            category_frame = ttk.Frame(win)
+            category_frame.pack(fill=tk.X,pady=5)
+
+            ttk.Label(category_frame,text="Section:").pack(side=tk.LEFT,padx=(5,2))
+            section_var = tk.StringVar()
+            section_menu = ttk.Combobox(category_frame, textvariable=section_var, values=list(self.sections.keys()), state='readonly')
+            section_menu.current(5)
+            section_menu.pack(side=tk.LEFT)        
+            section_menu.bind('<<ComboboxSelected>>', lambda e: change_categories())
+
+
+            ttk.Label(category_frame,text="Category:").pack(side=tk.LEFT,padx=(5,2))
+            category_var = tk.StringVar()
+            category_menu = ttk.Combobox(category_frame, textvariable=category_var, values=[], state='readonly',width=25)
+            category_menu.pack(side=tk.LEFT)
+
+            def change_categories():
+                category_menu.config(values=self.sections[section_var.get()])
+                category_menu.current(0)
+            
+            change_categories()
+
+            # Middle text
+            advert_text_field = tk.Text(win)
+            advert_text_field.pack(fill=tk.X,padx=5,pady=5)
+            advert_text_field.insert(tk.END,"")
+
+            # BOTTOM FRAME
+            bottom_frame = ttk.Frame(win)
+            bottom_frame.pack(fill=tk.X)
+
+            
+
+            def create_action():
+                title = title_var.get()
+                price = price_var.get()
+
+                if not price.strip().isnumeric():
+                    messagebox.showerror("Error","Price must be a number")
+                    return False
+                else:
+                    price = int(price)
+                section = section_var.get()
+                category = category_var.get()
+                
+                text = advert_text_field.get("1.0",tk.END)
+
+                if len(text)<2:
+                    messagebox.showerror("Error","Text too short")
+                    return False
+
+                result = self.create_advert(title,datetime.date.today(),self.active_user,price,section,category,text)
+
+                if result is True:
+                    win.destroy()
+                    self.show_my_adverts()
+                    messagebox.showinfo("Success","Succesfully created advert")
+
+                else:
+                    messagebox.showerror("Error",result)
+                    
+                
+
+
+            # Login button
+            result = ttk.Button(bottom_frame, text="Create",width=15,command=create_action).pack(side=tk.LEFT,padx=5,pady=5)
+                              
+            
 
     def create_tables(self):
+        os.makedirs("Adverts",exist_ok=True)
         with sqlite3.connect('database.db') as connection:
             cursor = connection.cursor()
 
@@ -729,6 +876,9 @@ class Inzeraty(tk.Tk):
         #create advert text file 
         if result:
             self.create_advert_file(title,text)
+            return True
+        
+        return "Error creating advert"
             
 
     def create_advert_file(self,title,text):
@@ -833,7 +983,7 @@ class Inzeraty(tk.Tk):
 if __name__ == '__main__':
     i = Inzeraty()
     # i.insert_user("admin","",0,i.passsword_hash("admin"),"admin")
-    # i.create_advert("I want to sell my PC",datetime.date.today(),"admin",9999,"PC","Desktop","This is my very special pc, I built it lorem ipsum lorem ipsum")
+    i.create_advert("I want to sell my Laptop",datetime.date.today(),"admin",9999,"PC","Desktop","This is my very special pc, I built it lorem ipsum lorem ipsum")
     
     i.mainloop()
     
