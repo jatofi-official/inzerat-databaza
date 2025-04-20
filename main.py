@@ -180,11 +180,13 @@ class Inzeraty(tk.Tk):
         # BOTTOM FRAME
         self.advert_bottom_frame = ttk.Frame(self.right_frame)
         self.advert_bottom_frame.pack(fill=tk.X)
-        self.advert_bottom_frame.columnconfigure(0,weight=1)
+        self.advert_bottom_frame.columnconfigure(0,weight=1,uniform="half")
+        self.advert_bottom_frame.columnconfigure(1,weight=1,uniform="half")
+        self.advert_bottom_frame.columnconfigure(2,weight=0)
 
         #user
         self.advert_user = ttk.Label(self.advert_bottom_frame,text="",anchor="w")
-        self.advert_user.grid(row=0, column=0, sticky="w", padx=5)
+        self.advert_user.grid(row=0, column=0, sticky="w", padx=5,pady=(5,0))
         # email
         self.advert_mail = ttk.Label(self.advert_bottom_frame,text="",anchor="w")
         self.advert_mail.grid(row=1, column=0, sticky="w", padx=5)
@@ -195,16 +197,23 @@ class Inzeraty(tk.Tk):
         self.advert_date = ttk.Label(self.advert_bottom_frame,text="",anchor="w")
         self.advert_date.grid(row=3, column=0, sticky="w", padx=5)
         # like count
-        self.advert_like_count = ttk.Label(self.advert_bottom_frame,text="asdf",anchor="w")
+        self.advert_like_count = ttk.Label(self.advert_bottom_frame,text="",anchor="w")
         self.advert_like_count.grid(row=4, column=0, sticky="w", padx=5)
         
+        # section title
+        self.advert_section = ttk.Label(self.advert_bottom_frame,text="Section: ",anchor="w")
+        self.advert_section.grid(row=0, column=1, sticky="w", padx=5,pady=(5,0))
+        # category title
+        self.advert_category = ttk.Label(self.advert_bottom_frame,text="Category: ",anchor="w")
+        self.advert_category.grid(row=1, column=1, sticky="w", padx=5)
+
         #like button
         self.advert_like_button = ttk.Button(self.advert_bottom_frame,text="Like",state=tk.DISABLED)
-        self.advert_like_button.grid(row=4, column=1, sticky="w", padx=5)
+        self.advert_like_button.grid(row=4, column=2, sticky="w", padx=5)
         
         # edit and delete buttons
         self.button_frame = ttk.Frame(self.advert_bottom_frame)
-        self.button_frame.grid(row=0, column=1, rowspan=4, sticky="ne", padx=5, pady=5)
+        self.button_frame.grid(row=0, column=2, rowspan=4, sticky="ne", padx=5, pady=5)
 
         self.advert_edit_button = ttk.Button(self.button_frame, text="Edit", state=tk.DISABLED,command=self.edit_button_pressed)
         self.advert_edit_button.pack(fill="x", pady=(0,5))
@@ -248,6 +257,7 @@ class Inzeraty(tk.Tk):
         self.right_side_created = False
 
 
+
     def delete_button_pressed(self):
         result = messagebox.askyesno("Delete advert?","Do you really want to delete advert?")
         if self.active_advert_id is not None:
@@ -266,15 +276,9 @@ class Inzeraty(tk.Tk):
                     self.active_advert_id = None
 
                     
+                    self.delete_advert_file(self.advert_title["text"])
 
-
-                    # Delete file
-                    filename = self.title_hash(self.advert_title["text"])
                     
-                    try:
-                        os.remove("Adverts/"+filename+".dat")
-                    except Exception as e:
-                        print(e)
 
                     #hide active advert text
                     self.delete_right_side()
@@ -287,7 +291,116 @@ class Inzeraty(tk.Tk):
 
     # TODO 
     def edit_button_pressed(self):
-        print("Edit button pressed")
+        if self.active_advert_id is not None:
+            # get data:
+            title = self.advert_title["text"]
+            price = self.advert_price["text"][:-2]
+            section = self.advert_section["text"][9:]
+            category = self.advert_category["text"][10:]
+            text = self.advert_text_field.get("1.0",tk.END)
+
+            #show window
+            # add the advert
+            win = tk.Toplevel(self)
+            
+            win.title("Edit advert")
+            win.geometry("500x600")
+
+            win.resizable(False, False)
+            # Right content 
+            #  ano... dalo by sa to spravit cez grid ale atp i dont care, ked to funguje:)
+            # TITLE FRAME
+            top_frame = ttk.Frame(win)
+            top_frame.pack(fill=tk.X,pady=5)
+            ttk.Label(top_frame,text="Edit advert:",font=("Arial", 14, "bold"),anchor="w").pack(side=tk.LEFT,padx=5,pady=5)
+
+            # MAIN FRAME
+            main_frame = ttk.Frame(win)
+            main_frame.pack(fill=tk.X,pady=5)
+
+            ttk.Label(main_frame,text="Title:").pack(side=tk.LEFT,padx=5)
+            title_var = tk.StringVar()
+            title_entry = ttk.Entry(main_frame, textvariable=title_var,width=40)
+            title_entry.pack(side=tk.LEFT, padx=5)
+            title_entry.insert(0,title)
+
+            ttk.Label(main_frame,text="€").pack(side=tk.RIGHT,padx=5)
+
+            price_var = tk.StringVar()
+            price_entry = ttk.Entry(main_frame, textvariable=price_var,width=10)
+            price_entry.pack(side=tk.RIGHT, padx=(5,2))
+            ttk.Label(main_frame,text="Price:").pack(side=tk.RIGHT,padx=5)
+            price_entry.insert(0,price)
+
+            # CATEGORY FRAME
+            category_frame = ttk.Frame(win)
+            category_frame.pack(fill=tk.X,pady=5)
+
+            ttk.Label(category_frame,text="Section:").pack(side=tk.LEFT,padx=(5,2))
+            section_var = tk.StringVar()
+            section_menu = ttk.Combobox(category_frame, textvariable=section_var, values=list(self.sections.keys()), state='readonly')
+            
+            #get current
+            index = list(self.sections.keys()).index(section)
+
+            section_menu.current(index)
+            section_menu.pack(side=tk.LEFT)        
+            section_menu.bind('<<ComboboxSelected>>', lambda e: change_categories())
+
+
+            ttk.Label(category_frame,text="Category:").pack(side=tk.LEFT,padx=(5,2))
+            category_var = tk.StringVar()
+            category_menu = ttk.Combobox(category_frame, textvariable=category_var, values=self.sections[section], state='readonly',width=25)
+            category_menu.pack(side=tk.LEFT)
+
+            #get current
+            index = list(self.sections[section]).index(category)
+            category_menu.current(index)
+
+            def change_categories():
+                category_menu.config(values=self.sections[section_var.get()])
+                category_menu.current(0)
+            
+
+            # Middle text
+            advert_text_field = tk.Text(win)
+            advert_text_field.pack(fill=tk.X,padx=5,pady=5)
+            advert_text_field.insert(tk.END,"")
+
+            advert_text_field.insert("1.0",text)
+
+            # BOTTOM FRAME
+            bottom_frame = ttk.Frame(win)
+            bottom_frame.pack(fill=tk.X)
+
+            
+            def update_action():
+                title = title_var.get()
+                price = price_var.get()
+
+                if not price.strip().isnumeric():
+                    messagebox.showerror("Error","Price must be a number")
+                    return False
+                else:
+                    price = int(price)
+                section = section_var.get()
+                category = category_var.get()
+                
+                text = advert_text_field.get("1.0",tk.END)
+
+                if len(text)<2:
+                    messagebox.showerror("Error","Text too short")
+                    return False
+
+                result = self.update_advert(title,self.active_user,price,section,category,text)
+
+                if result is True:
+                    win.destroy()
+                    self.show_my_adverts()
+                    messagebox.showinfo("Success","Succesfully created advert")
+
+                else:
+                    messagebox.showerror("Error",result)
 
     def search_button_pressed(self):
         self.search_adverts()
@@ -395,17 +508,6 @@ class Inzeraty(tk.Tk):
                 result = self.create_user(typed_name,typed_email,typed_phone,typed_password,username)
                 if result is not True:
                     self.error_message.config(text=result)
-                # check validity:
-                # hashed = self.passsword_hash(typed_password)
-
-                # Check login information                
-                # query_str = "SELECT * FROM Users WHERE username = ? AND password = ?"
-                # with sqlite3.connect('database.db') as connection:
-                #     cursor = connection.cursor()
-                #     query_str = "SELECT * FROM Users WHERE username = ? AND password = ?"
-                #     cursor.execute(query_str, (typed_username, hashed))
-                #     result = cursor.fetchone()
-
 
                 else:  # SUCCESSFUL LOGIN
                     if username_entry.get() =="":
@@ -417,8 +519,10 @@ class Inzeraty(tk.Tk):
             ttk.Button(win, text="Login", command=register_action).grid(row=6, column=0, columnspan=2, pady=10)
         
         else:
-            print("Delete user")
-    
+            result = messagebox.askyesno("Delete user?","Do you really want to delete your account?")
+            if result is True:
+                self.delete_user(self.active_user)
+                self.log_out(True)
 
     def log_in(self,result):
         self.user_label.config(text=result[1])
@@ -437,8 +541,11 @@ class Inzeraty(tk.Tk):
         # print(result[2])
         self.show_my_adverts()
     
-    def log_out(self):
-        result = messagebox.askquestion("askquestion", "Do you really want to log out?") 
+    def log_out(self,was_deleted = False):
+        if was_deleted is False:
+            result = messagebox.askquestion("askquestion", "Do you really want to log out?") 
+        else:
+            result = "yes"
         if result == "yes":
             self.user_label.config(text="Not logged in")
             self.login_button.config(text="Login")
@@ -453,6 +560,7 @@ class Inzeraty(tk.Tk):
 
             
             self.active_user = None
+        
 
     #When list item is selected
     def on_item_selected(self,event):
@@ -579,7 +687,11 @@ class Inzeraty(tk.Tk):
         self.advert_price.config(text=str(advert_result[4])+" €")
 
         self.advert_like_count.config(text="Likes: "+str(advert_result[7])+"👍")
+
+        self.advert_section.config(text="Section: "+advert_result[5])
         
+        self.advert_category.config(text="Category: "+advert_result[6])
+
         # text field
         self.advert_text_field.config(state=tk.NORMAL)
         self.advert_text_field.delete("1.0",tk.END)
@@ -609,8 +721,6 @@ class Inzeraty(tk.Tk):
                 self.advert_edit_button.config(state=tk.DISABLED)
                 self.advert_delete_button.config(state=tk.DISABLED) 
                 self.active_advert_id = None
-
-
 
     def get_advert_text(self, title):
         try:
@@ -810,6 +920,7 @@ class Inzeraty(tk.Tk):
         result = self.insert_user(name,email,phone,hashed,username)
         return result
 
+
     def insert_user(self,name,email,phone,password,username):
         try:
 
@@ -832,6 +943,28 @@ class Inzeraty(tk.Tk):
                 return True
         except Exception as e:
             print("Error insertig into database: ",e)
+            return False
+
+
+    def delete_user(self,username):
+        try:
+            #insert into database
+            with sqlite3.connect('database.db') as connection:
+                cursor = connection.cursor()
+
+                # Insert a record into the Students table
+                delete_query = "DELETE FROM Users WHERE username = ?;"
+                
+
+                cursor.execute(delete_query, (username,))
+
+                # Commit the changes automatically
+                connection.commit()
+
+                
+                return True
+        except Exception as e:
+            print("Error deleting from database: ",e)
             return False
 
 
@@ -887,6 +1020,15 @@ class Inzeraty(tk.Tk):
             byte_text = text.encode()
             subor.write(byte_text)
 
+    def delete_advert_file(self,title):
+        # Delete file
+        filename = self.title_hash(title)
+        
+        try:
+            os.remove("Adverts/"+filename+".dat")
+        except Exception as e:
+            print(e)
+
     def insert_advert(self,title,date_created, user, price, section, category):
 
         try:
@@ -910,6 +1052,9 @@ class Inzeraty(tk.Tk):
             print("Error insertig into database: ",e)
             return False
 
+    def update_advert(self,title,user,price,section,category,text):
+        pass
+        
     def title_hash(self,title):
         return hashlib.md5(title.encode()).hexdigest()
 
@@ -983,7 +1128,7 @@ class Inzeraty(tk.Tk):
 if __name__ == '__main__':
     i = Inzeraty()
     # i.insert_user("admin","",0,i.passsword_hash("admin"),"admin")
-    i.create_advert("I want to sell my Laptop",datetime.date.today(),"admin",9999,"PC","Desktop","This is my very special pc, I built it lorem ipsum lorem ipsum")
+    # i.create_advert("I want to sell my Laptop",datetime.date.today(),"admin",9999,"PC","Desktop","This is my very special pc, I built it lorem ipsum lorem ipsum")
     
     i.mainloop()
     

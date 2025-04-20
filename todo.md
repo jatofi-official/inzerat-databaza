@@ -6,5 +6,4 @@
 ### Functionality
 - Likes
 - Tags
-- Add Adverts
 - Edit adverts
