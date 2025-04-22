@@ -313,24 +313,23 @@ class Inzeraty(tk.Tk):
             top_frame = ttk.Frame(win)
             top_frame.pack(fill=tk.X,pady=5)
             ttk.Label(top_frame,text="Edit advert:",font=("Arial", 14, "bold"),anchor="w").pack(side=tk.LEFT,padx=5,pady=5)
-
-            # MAIN FRAME
+            # # MAIN FRAME
             main_frame = ttk.Frame(win)
             main_frame.pack(fill=tk.X,pady=5)
 
+            title_var = tk.StringVar(value="text")
             ttk.Label(main_frame,text="Title:").pack(side=tk.LEFT,padx=5)
-            title_var = tk.StringVar()
             title_entry = ttk.Entry(main_frame, textvariable=title_var,width=40)
             title_entry.pack(side=tk.LEFT, padx=5)
-            title_entry.insert(0,title)
 
             ttk.Label(main_frame,text="€").pack(side=tk.RIGHT,padx=5)
 
-            price_var = tk.StringVar()
+            price_var = tk.StringVar(value=price)
             price_entry = ttk.Entry(main_frame, textvariable=price_var,width=10)
             price_entry.pack(side=tk.RIGHT, padx=(5,2))
             ttk.Label(main_frame,text="Price:").pack(side=tk.RIGHT,padx=5)
-            price_entry.insert(0,price)
+
+            print((title,price))
 
             # CATEGORY FRAME
             category_frame = ttk.Frame(win)
@@ -350,14 +349,18 @@ class Inzeraty(tk.Tk):
 
             ttk.Label(category_frame,text="Category:").pack(side=tk.LEFT,padx=(5,2))
             category_var = tk.StringVar()
-            category_menu = ttk.Combobox(category_frame, textvariable=category_var, values=self.sections[section], state='readonly',width=25)
-            category_menu.pack(side=tk.LEFT)
+            category_menu = ttk.Combobox(category_frame, textvariable=category_var, values=[], state='readonly',width=25)
 
             #get current
-            index = list(self.sections[section]).index(category)
-            category_menu.current(index)
+            # z nejakeho HROZNEHO dovodu to robi presne to co chcem... ale nezobrazi toc
+            category_menu.config(values=self.sections[section_var.get()])
+            index2 = list(self.sections[section]).index(category)
+            category_menu.current(index2)
+            category_menu.pack(side=tk.LEFT)
+
 
             def change_categories():
+                # print("change_categories")
                 category_menu.config(values=self.sections[section_var.get()])
                 category_menu.current(0)
             
@@ -370,8 +373,8 @@ class Inzeraty(tk.Tk):
             advert_text_field.insert("1.0",text)
 
             # BOTTOM FRAME
-            bottom_frame = ttk.Frame(win)
-            bottom_frame.pack(fill=tk.X)
+            # bottom_frame = ttk.Frame(win)
+            # bottom_frame.pack(fill=tk.X)
 
             
             def update_action():
@@ -554,12 +557,18 @@ class Inzeraty(tk.Tk):
             #update current advert
             if self.right_side_created:
                 if self.advert_user["text"]== "User: "+self.active_user:
-                    self.advert_edit_button.config(state=tk.DISABLED)
-                    self.advert_delete_button.config(state=tk.DISABLED)
+                    self.active_user = None 
+                    if was_deleted is True:
+                        print("user was deleted and active advert belongs to user")
+                        self.delete_right_side()
+                        return
+                    else:
+                        self.advert_edit_button.config(state=tk.DISABLED)
+                        self.advert_delete_button.config(state=tk.DISABLED)
+                    
                 self.advert_like_button.config(state=tk.DISABLED)
 
             
-            self.active_user = None
         
 
     #When list item is selected
@@ -958,11 +967,22 @@ class Inzeraty(tk.Tk):
 
                 cursor.execute(delete_query, (username,))
 
+                #delete all adverts by user
+                search_query = "SELECT id,title FROM Adverts WHERE user = ?;"
+
+                cursor.execute(search_query,(username,))
+
+                results = cursor.fetchall()
+                for result in results:
+                    cursor.execute("DELETE FROM Adverts WHERE id=?;",(result[0],))
+                    self.delete_advert_file(result[1])
+
                 # Commit the changes automatically
                 connection.commit()
 
-                
-                return True
+            self.search_adverts()
+            
+            return True
         except Exception as e:
             print("Error deleting from database: ",e)
             return False
@@ -1129,6 +1149,6 @@ if __name__ == '__main__':
     i = Inzeraty()
     # i.insert_user("admin","",0,i.passsword_hash("admin"),"admin")
     # i.create_advert("I want to sell my Laptop",datetime.date.today(),"admin",9999,"PC","Desktop","This is my very special pc, I built it lorem ipsum lorem ipsum")
-    
+    i.log_in([0,"admin","admin"])
     i.mainloop()
     
