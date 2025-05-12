@@ -567,6 +567,7 @@ class Inzeraty(tk.Tk):
                         self.advert_delete_button.config(state=tk.DISABLED)
                     
                 self.advert_like_button.config(state=tk.DISABLED)
+            self.active_user = None
 
             
         
@@ -1149,6 +1150,6 @@ if __name__ == '__main__':
     i = Inzeraty()
     # i.insert_user("admin","",0,i.passsword_hash("admin"),"admin")
     # i.create_advert("I want to sell my Laptop",datetime.date.today(),"admin",9999,"PC","Desktop","This is my very special pc, I built it lorem ipsum lorem ipsum")
-    i.log_in([0,"admin","admin"])
+    # i.log_in([0,"admin","admin"])
     i.mainloop()
     
