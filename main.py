@@ -308,11 +308,17 @@ class Inzeraty(tk.Tk):
 
             win.resizable(False, False)
             # Right content 
-            #  ano... dalo by sa to spravit cez grid ale atp i dont care, ked to funguje:)
+            
             # TITLE FRAME
             top_frame = ttk.Frame(win)
             top_frame.pack(fill=tk.X,pady=5)
             ttk.Label(top_frame,text="Edit advert:",font=("Arial", 14, "bold"),anchor="w").pack(side=tk.LEFT,padx=5,pady=5)
+            # OLD INFORMATION FRAME 
+            # old_info_frame = ttk.Frame(win)
+            # old_info_frame.pack(fill=tk.X,pady=5)
+            # ttk.Label(old_info_frame,text="Old title: "+title).pack(side=tk.LEFT,padx=5)
+            # ttk.Label(old_info_frame,text="Old price: "+price).pack(side=tk.RIGHT,padx=25)
+
             # # MAIN FRAME
             main_frame = ttk.Frame(win)
             main_frame.pack(fill=tk.X,pady=5)
@@ -329,7 +335,7 @@ class Inzeraty(tk.Tk):
             price_entry.pack(side=tk.RIGHT, padx=(5,2))
             ttk.Label(main_frame,text="Price:").pack(side=tk.RIGHT,padx=5)
 
-            print((title,price))
+            # print((title,price))
 
             # CATEGORY FRAME
             category_frame = ttk.Frame(win)
@@ -352,7 +358,6 @@ class Inzeraty(tk.Tk):
             category_menu = ttk.Combobox(category_frame, textvariable=category_var, values=[], state='readonly',width=25)
 
             #get current
-            # z nejakeho HROZNEHO dovodu to robi presne to co chcem... ale nezobrazi toc
             category_menu.config(values=self.sections[section_var.get()])
             index2 = list(self.sections[section]).index(category)
             category_menu.current(index2)
@@ -373,10 +378,10 @@ class Inzeraty(tk.Tk):
             advert_text_field.insert("1.0",text)
 
             # BOTTOM FRAME
-            # bottom_frame = ttk.Frame(win)
-            # bottom_frame.pack(fill=tk.X)
+            bottom_frame = ttk.Frame(win)
+            bottom_frame.pack(fill=tk.X,padx=5,pady=5)
 
-            
+
             def update_action():
                 title = title_var.get()
                 price = price_var.get()
@@ -395,15 +400,18 @@ class Inzeraty(tk.Tk):
                     messagebox.showerror("Error","Text too short")
                     return False
 
-                result = self.update_advert(title,self.active_user,price,section,category,text)
+                result = self.update_advert(self.active_advert_id,title,price,section,category,text)
 
                 if result is True:
                     win.destroy()
                     self.show_my_adverts()
-                    messagebox.showinfo("Success","Succesfully created advert")
+                    messagebox.showinfo("Success","Succesfully edited advert")
 
                 else:
                     messagebox.showerror("Error",result)
+
+            result = ttk.Button(bottom_frame, text="Confirm",width=15,command=update_action).pack(side=tk.LEFT,pady=5)
+
 
     def search_button_pressed(self):
         self.search_adverts()
@@ -539,6 +547,7 @@ class Inzeraty(tk.Tk):
                 self.advert_edit_button.config(state=tk.NORMAL)
                 self.advert_delete_button.config(state=tk.NORMAL)
             self.advert_like_button.config(state=tk.NORMAL)
+            
 
 
         # print(result[2])
@@ -718,6 +727,9 @@ class Inzeraty(tk.Tk):
         # date
         self.advert_date.config(text="Posted on: "+str(advert_result[2]))
 
+        self.active_advert_id = advert_id
+
+
         #check if user is logged in
         if self.active_user is not None:
             self.advert_like_button.config(state=tk.NORMAL)            
@@ -726,11 +738,10 @@ class Inzeraty(tk.Tk):
             if self.active_user == advert_result[3]:
                 self.advert_edit_button.config(state=tk.NORMAL)
                 self.advert_delete_button.config(state=tk.NORMAL)
-                self.active_advert_id = advert_id
             else:
                 self.advert_edit_button.config(state=tk.DISABLED)
-                self.advert_delete_button.config(state=tk.DISABLED) 
-                self.active_advert_id = None
+                self.advert_delete_button.config(state=tk.DISABLED)
+         
 
     def get_advert_text(self, title):
         try:
@@ -1007,7 +1018,7 @@ class Inzeraty(tk.Tk):
         #check for conditions
         
         #title
-        if type(title) != str or len(title) <1:
+        if type(title) != str or len(title.strip()) <1:
             return "Invalid title."
         
         #section
@@ -1050,6 +1061,18 @@ class Inzeraty(tk.Tk):
         except Exception as e:
             print(e)
 
+    def update_advert_file(self, title, text):
+        try:
+            filename = self.title_hash(title)
+            with open("Adverts/" + filename + ".dat", "wb") as file:
+                file.write(text.encode())
+            return True
+        
+        except Exception as e:
+            print("Error updating advert file:", e)
+            return False
+
+
     def insert_advert(self,title,date_created, user, price, section, category):
 
         try:
@@ -1073,9 +1096,68 @@ class Inzeraty(tk.Tk):
             print("Error insertig into database: ",e)
             return False
 
-    def update_advert(self,title,user,price,section,category,text):
-        pass
-        
+    def modify_advert(self, advert_id, title, price, section, category):
+        try:
+            with sqlite3.connect('database.db') as connection:
+                cursor = connection.cursor()
+
+                # Update the record in the Adverts table
+                update_query = '''
+                UPDATE Adverts 
+                SET title = ?, price = ?, section = ?, category = ? 
+                WHERE id = ?;
+                '''
+
+                cursor.execute(update_query, (title, price, section, category, advert_id))
+
+                connection.commit()
+
+                # Check if any row was updated
+                if cursor.rowcount == 0:
+                    print("No advert found with ID:", advert_id)
+                    return False
+
+                return True
+            
+        except Exception as e:
+            print("Error updating advert in database:", e)
+            return False
+
+
+    def update_advert(self, advert_id, title, price, section, category, text):
+        #check for conditions
+
+        #title
+        if type(title) != str or len(title.strip()) < 1:
+            print(type(title))
+            print(title)
+            return "Invalid title."
+
+        #section
+        if section not in self.sections.keys():
+            section = "Ostatné"
+
+        #category
+        if category not in self.sections[section]:
+            category = "Ostatné"
+
+        #price
+        if type(price) != int:
+            return "Invalid price."
+        elif price < 0:
+            return "Price cannot be negative."
+
+        #insert advert
+        result = self.modify_advert(advert_id, title, price, section, category)
+
+        # Update advert text file
+        if result:
+            print("Updating file")
+            self.update_advert_file(title, text)
+            return True
+
+        return "Error updating advert."
+
     def title_hash(self,title):
         return hashlib.md5(title.encode()).hexdigest()
 
