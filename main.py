@@ -113,7 +113,7 @@ class Inzeraty(tk.Tk):
         ttk.Label(advanced_search_frame, text="Sort by:").pack(side=tk.LEFT, padx=(6,0))
         self.sort_by_var = tk.StringVar()
 
-        sort_by_menu = ttk.Combobox(advanced_search_frame, textvariable=self.sort_by_var, values=["Likes","Price","Title","Date"], state='readonly',width=7)
+        sort_by_menu = ttk.Combobox(advanced_search_frame, textvariable=self.sort_by_var, values=["Price","Title","Date"], state='readonly',width=7)
         sort_by_menu.current(0)
         sort_by_menu.pack(side=tk.LEFT)
         sort_by_menu.bind('<<ComboboxSelected>>', lambda e: self.search_adverts())
@@ -121,7 +121,7 @@ class Inzeraty(tk.Tk):
         #ascending/descentind
         self.order_by_var = tk.StringVar()
 
-        order_by_menu = ttk.Combobox(advanced_search_frame, textvariable=self.order_by_var, values=["Descending","Ascending"], state='readonly',width=10)
+        order_by_menu = ttk.Combobox(advanced_search_frame, textvariable=self.order_by_var, values=["Ascending","Descending"], state='readonly',width=10)
         order_by_menu.current(0)
         order_by_menu.pack(side=tk.LEFT,padx=5)
         order_by_menu.bind('<<ComboboxSelected>>', lambda e: self.search_adverts())
@@ -196,9 +196,6 @@ class Inzeraty(tk.Tk):
         # date
         self.advert_date = ttk.Label(self.advert_bottom_frame,text="",anchor="w")
         self.advert_date.grid(row=3, column=0, sticky="w", padx=5)
-        # like count
-        self.advert_like_count = ttk.Label(self.advert_bottom_frame,text="",anchor="w")
-        self.advert_like_count.grid(row=4, column=0, sticky="w", padx=5)
         
         # section title
         self.advert_section = ttk.Label(self.advert_bottom_frame,text="Section: ",anchor="w")
@@ -207,10 +204,6 @@ class Inzeraty(tk.Tk):
         self.advert_category = ttk.Label(self.advert_bottom_frame,text="Category: ",anchor="w")
         self.advert_category.grid(row=1, column=1, sticky="w", padx=5)
 
-        #like button
-        self.advert_like_button = ttk.Button(self.advert_bottom_frame,text="Like",state=tk.DISABLED)
-        self.advert_like_button.grid(row=4, column=2, sticky="w", padx=5)
-        
         # edit and delete buttons
         self.button_frame = ttk.Frame(self.advert_bottom_frame)
         self.button_frame.grid(row=0, column=2, rowspan=4, sticky="ne", padx=5, pady=5)
@@ -229,7 +222,6 @@ class Inzeraty(tk.Tk):
         self.advert_top_frame.destroy()
 
         self.advert_title.destroy()
-        self.advert_like_count.destroy()
         # Middle text
         self.advert_text_field.destroy()
         # BOTTOM FRAME
@@ -244,8 +236,6 @@ class Inzeraty(tk.Tk):
         self.advert_phone.destroy()
         # date
         self.advert_date.destroy()
-        # like
-        self.advert_like_button.destroy()
         
         # edit and delete buttons
         self.button_frame.destroy()
@@ -546,7 +536,6 @@ class Inzeraty(tk.Tk):
             if self.advert_user["text"]== "User: "+self.active_user:
                 self.advert_edit_button.config(state=tk.NORMAL)
                 self.advert_delete_button.config(state=tk.NORMAL)
-            self.advert_like_button.config(state=tk.NORMAL)
             
 
 
@@ -575,7 +564,6 @@ class Inzeraty(tk.Tk):
                         self.advert_edit_button.config(state=tk.DISABLED)
                         self.advert_delete_button.config(state=tk.DISABLED)
                     
-                self.advert_like_button.config(state=tk.DISABLED)
             self.active_user = None
 
             
@@ -611,7 +599,7 @@ class Inzeraty(tk.Tk):
         if self.active_user is None:
             messagebox.showwarning("Not logged in","You are not logged in")
         else:
-            query_str = "SELECT id,title FROM Adverts WHERE user='"+self.active_user+"' ORDER BY likes DESC;"
+            query_str = "SELECT id,title FROM Adverts WHERE user='"+self.active_user+"' ORDER BY price DESC;"
             # Get Adverts
             with sqlite3.connect('database.db') as connection:
                 cursor = connection.cursor()
@@ -705,7 +693,6 @@ class Inzeraty(tk.Tk):
 
         self.advert_price.config(text=str(advert_result[4])+" €")
 
-        self.advert_like_count.config(text="Likes: "+str(advert_result[7])+"👍")
 
         self.advert_section.config(text="Section: "+advert_result[5])
         
@@ -731,8 +718,7 @@ class Inzeraty(tk.Tk):
 
 
         #check if user is logged in
-        if self.active_user is not None:
-            self.advert_like_button.config(state=tk.NORMAL)            
+        if self.active_user is not None:      
 
             # check is active user is the same as creator
             if self.active_user == advert_result[3]:
@@ -884,8 +870,7 @@ class Inzeraty(tk.Tk):
                 user TEXT,
                 price INTEGER,
                 section TEXT,
-                category TEXT,
-                likes INTEGER
+                category TEXT
             );
             '''
 
@@ -1081,8 +1066,8 @@ class Inzeraty(tk.Tk):
 
                 # Insert a record into the Adverts table
                 insert_query = '''
-                INSERT INTO Adverts (title, date_created, user, price, section, category, likes) 
-                VALUES (?, ?, ?, ?, ?, ?,0);
+                INSERT INTO Adverts (title, date_created, user, price, section, category) 
+                VALUES (?, ?, ?, ?, ?, ?);
                 '''
 
                 cursor.execute(insert_query, (title,date_created,user,price,section,category))
