@@ -4,7 +4,7 @@ import datetime
 import random
 import tkinter as tk
 from tkinter import ttk, messagebox
-import faker
+# import faker
 import os
 
 
@@ -1216,20 +1216,16 @@ class Inzeraty(tk.Tk):
             connection.commit()
 
 
-# if __name__ == '__main__':
-#     i = Inzeraty()
-#     # i.insert_user("admin","",0,i.passsword_hash("admin"),"admin")
-#     # i.create_advert("I want to sell my Laptop",datetime.date.today(),"admin",9999,"PC","Desktop","This is my very special pc, I built it lorem ipsum lorem ipsum")
-#     # i.log_in([0,"admin","admin"])
-#     i.mainloop()
-
-
-#velmi primitivny test, viac treba spravit vramci GUI
-testuj=False
-if testuj:
-    i= Inzeraty()
-    i.insert_user("admin","",0,i.passsword_hash("admin"),"admin")
-    i.create_advert("I want to sell my Laptop",datetime.date.today(),"admin",9999,"PC","Desktop","This is my very special pc, I built it lorem ipsum lorem ipsum")
-    i.log_in([0,"admin","admin"])
-    i.update_advert(145,"New Title",100,"Nábytok","Stôl","Novy text")
-    i.delete_advert(146)
+if __name__ == '__main__':
+    #velmi primitivny test, viac treba spravit vramci GUI
+    testuj=False
+    if testuj:
+        i= Inzeraty()
+        i.insert_user("admin","",0,i.passsword_hash("admin"),"admin")
+        i.create_advert("I want to sell my Laptop",datetime.date.today(),"admin",9999,"PC","Desktop","This is my very special pc, I built it lorem ipsum lorem ipsum")
+        i.log_in([0,"admin","admin"])
+        i.update_advert(145,"New Title",100,"Nábytok","Stôl","Novy text")
+        i.delete_advert(146)
+    else:
+        i = Inzeraty()
+        i.mainloop()
