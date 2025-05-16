@@ -286,7 +286,7 @@ class Inzeraty(tk.Tk):
     def edit_button_pressed(self):
         if self.active_advert_id is not None:
             # get data:
-            title = self.advert_title["text"]
+            old_title = self.advert_title["text"]
             price = self.advert_price["text"][:-2]
             section = self.advert_section["text"][9:]
             category = self.advert_category["text"][10:]
@@ -316,7 +316,7 @@ class Inzeraty(tk.Tk):
             main_frame = ttk.Frame(win)
             main_frame.pack(fill=tk.X,pady=5)
 
-            title_var = tk.StringVar(value="text")
+            title_var = tk.StringVar(value=old_title)
             ttk.Label(main_frame,text="Title:").pack(side=tk.LEFT,padx=5)
             title_entry = ttk.Entry(main_frame, textvariable=title_var,width=40)
             title_entry.pack(side=tk.LEFT, padx=5)
@@ -393,7 +393,7 @@ class Inzeraty(tk.Tk):
                     messagebox.showerror("Error","Text too short")
                     return False
 
-                result = self.update_advert(self.active_advert_id,title,price,section,category,text)
+                result = self.update_advert(self.active_advert_id,title,old_title,price,section,category,text)
 
                 if result is True:
                     win.destroy()
@@ -1049,9 +1049,15 @@ class Inzeraty(tk.Tk):
         except Exception as e:
             print(e)
 
-    def update_advert_file(self, title, text):
+    def update_advert_file(self, title, old_title, text):
         try:
+            print(old_title)
             filename = self.title_hash(title)
+            old_filename = self.title_hash(old_title)
+
+            if os.path.exists("Adverts/"+old_filename + ".dat"):
+                os.remove("Adverts/"+old_filename + ".dat")
+
             with open("Adverts/" + filename + ".dat", "wb") as file:
                 file.write(text.encode())
             return True
@@ -1112,7 +1118,7 @@ class Inzeraty(tk.Tk):
             return False
 
 
-    def update_advert(self, advert_id, title, price, section, category, text):
+    def update_advert(self, advert_id, title, old_title,price, section, category, text):
         #check for conditions
 
         #title
@@ -1141,7 +1147,7 @@ class Inzeraty(tk.Tk):
         # Update advert text file
         if result:
             print("Updating file")
-            self.update_advert_file(title, text)
+            self.update_advert_file(title,old_title, text)
             return True
 
         return "Error updating advert."
@@ -1150,81 +1156,92 @@ class Inzeraty(tk.Tk):
         return hashlib.md5(title.encode()).hexdigest()
 
 
-    def fill_random(self,num_users=0, num_adverts=0):
-        fake = faker.Faker()
+    # def fill_random(self,num_users=0, num_adverts=0):
+    #     fake = faker.Faker()
 
-        with sqlite3.connect('database.db') as connection:
-            cursor = connection.cursor()
+    #     with sqlite3.connect('database.db') as connection:
+    #         cursor = connection.cursor()
 
-            # Generate users
-            users = []
-            for i in range(num_users):
-                name = fake.name()
-                username = "_".join(name.lower().split(" "))+str(random.randint(0,10))
-                email = "_".join(name.lower().split(" "))+str(random.randint(0,10)) + "@example.com"
-                phone = fake.random_int(min=1000000000, max=9999999999)
-                # password = "_".join(fake.words(2)) + str(random.randint(0,99))
-                password = self.passsword_hash(fake.word())
-                users.append((name, username,email, phone, password))
+    #         # Generate users
+    #         users = []
+    #         for i in range(num_users):
+    #             name = fake.name()
+    #             username = "_".join(name.lower().split(" "))+str(random.randint(0,10))
+    #             email = "_".join(name.lower().split(" "))+str(random.randint(0,10)) + "@example.com"
+    #             phone = fake.random_int(min=1000000000, max=9999999999)
+    #             # password = "_".join(fake.words(2)) + str(random.randint(0,99))
+    #             password = self.passsword_hash(fake.word())
+    #             users.append((name, username,email, phone, password))
 
-            # Insert Users
-            cursor.executemany('''
-            INSERT INTO Users (name, username, email, phone, password)
-            VALUES (?, ?, ?, ?, ?);''', users)
+    #         # Insert Users
+    #         cursor.executemany('''
+    #         INSERT INTO Users (name, username, email, phone, password)
+    #         VALUES (?, ?, ?, ?, ?);''', users)
             
 
-            # Generate adverts
+    #         # Generate adverts
 
-            # get usernames
-            cursor.execute('SELECT username FROM Users')
-            usernames = [row[0] for row in cursor.fetchall()]
-
-
-            adverts = []
-            for i in range(num_adverts):
+    #         # get usernames
+    #         cursor.execute('SELECT username FROM Users')
+    #         usernames = [row[0] for row in cursor.fetchall()]
 
 
-                date_created = fake.date_between(start_date='-1y', end_date='today')
-                user = random.choice(usernames)
-                price = random.randint(10, 1000)
+    #         adverts = []
+    #         for i in range(num_adverts):
 
-                title = "Selling " + fake.word() + " for " +str(price) + " €"
+
+    #             date_created = fake.date_between(start_date='-1y', end_date='today')
+    #             user = random.choice(usernames)
+    #             price = random.randint(10, 1000)
+
+    #             title = "Selling " + fake.word() + " for " +str(price) + " €"
                 
-                section = random.choice(list(self.sections.keys()))
-                category = random.choice(self.sections[section])
-                likes = random.randint(0,256)
+    #             section = random.choice(list(self.sections.keys()))
+    #             category = random.choice(self.sections[section])
+    #             likes = random.randint(0,256)
 
-                adverts.append((title, date_created, user, price, section, category,likes))
+    #             adverts.append((title, date_created, user, price, section, category,likes))
 
-                text = ""
-                for sentence in fake.sentences(random.randint(5,11)):
-                    text += sentence + " "
-                # print(text)
+    #             text = ""
+    #             for sentence in fake.sentences(random.randint(5,11)):
+    #                 text += sentence + " "
+    #             # print(text)
 
-                self.create_advert_file(title,text)
+    #             self.create_advert_file(title,text)
 
 
-            # print(*adverts,sep="\n")
+    #         # print(*adverts,sep="\n")
 
             
-            # Insert Adverts
+    #         # Insert Adverts
 
-            cursor.executemany('''
-            INSERT INTO Adverts (title, date_created, user, price, section, category, likes)
-            VALUES (?, ?, ?, ?, ?, ?, ?);''', adverts)
+    #         cursor.executemany('''
+    #         INSERT INTO Adverts (title, date_created, user, price, section, category, likes)
+    #         VALUES (?, ?, ?, ?, ?, ?, ?);''', adverts)
 
-            connection.commit()
+    #         connection.commit()
 
 
 if __name__ == '__main__':
     #velmi primitivny test, viac treba spravit vramci GUI
-    testuj=False
-    if testuj:
+    while(True):
+        odpoved=input("Chcete prejsť predrobené testy? y/N ")
+        if odpoved == "y" or odpoved=="Y":
+            testuj = True
+            break
+        elif odpoved =="n" or odpoved=="N" or odpoved =="":
+            testuj = False
+            break
+        else:
+            print("Nesprávny formát")
+    
+
+    if testuj is True:
         i= Inzeraty()
         i.insert_user("admin","",0,i.passsword_hash("admin"),"admin")
         i.create_advert("I want to sell my Laptop",datetime.date.today(),"admin",9999,"PC","Desktop","This is my very special pc, I built it lorem ipsum lorem ipsum")
         i.log_in([0,"admin","admin"])
-        i.update_advert(145,"New Title",100,"Nábytok","Stôl","Novy text")
+        i.update_advert(145,"New Title 2","New Title",100,"Nábytok","Stôl","Novy text"+str(random.randint(0,100)))
         i.delete_advert(146)
     else:
         i = Inzeraty()
