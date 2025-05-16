@@ -252,33 +252,36 @@ class Inzeraty(tk.Tk):
         result = messagebox.askyesno("Delete advert?","Do you really want to delete advert?")
         if self.active_advert_id is not None:
             if result: # delete advert
-                query_str = "DELETE FROM Adverts WHERE id = ?;"
-                try:
-                    with sqlite3.connect('database.db') as connection:
-                        cursor = connection.cursor()
+                self.delete_advert(self.active_advert_id)
+                
+    def delete_advert(self,id):
+        query_str = "DELETE FROM Adverts WHERE id = ?;"
+        try:
+            with sqlite3.connect('database.db') as connection:
+                cursor = connection.cursor()
 
-                        cursor.execute(query_str,(self.active_advert_id,))
+                cursor.execute(query_str,(id,))
 
-                        connection.commit()
+                connection.commit()
 
-                    
-                    #Hide active advert 
-                    self.active_advert_id = None
+            
+            #Hide active advert 
+            self.active_advert_id = None
 
-                    
-                    self.delete_advert_file(self.advert_title["text"])
+            
+            self.delete_advert_file(self.advert_title["text"])
 
-                    
+            
 
-                    #hide active advert text
-                    self.delete_right_side()
+            #hide active advert text
+            self.delete_right_side()
 
-                    #update search query
-                    self.search_adverts()
+            #update search query
+            self.search_adverts()
 
-                except:
-                    print("Error deleting advert id:",self.active_advert_id)
-
+        except:
+            print("Error deleting advert id:",self.active_advert_id)
+        
     # TODO 
     def edit_button_pressed(self):
         if self.active_advert_id is not None:
@@ -1213,10 +1216,20 @@ class Inzeraty(tk.Tk):
             connection.commit()
 
 
-if __name__ == '__main__':
-    i = Inzeraty()
-    # i.insert_user("admin","",0,i.passsword_hash("admin"),"admin")
-    # i.create_advert("I want to sell my Laptop",datetime.date.today(),"admin",9999,"PC","Desktop","This is my very special pc, I built it lorem ipsum lorem ipsum")
-    # i.log_in([0,"admin","admin"])
-    i.mainloop()
-    
+# if __name__ == '__main__':
+#     i = Inzeraty()
+#     # i.insert_user("admin","",0,i.passsword_hash("admin"),"admin")
+#     # i.create_advert("I want to sell my Laptop",datetime.date.today(),"admin",9999,"PC","Desktop","This is my very special pc, I built it lorem ipsum lorem ipsum")
+#     # i.log_in([0,"admin","admin"])
+#     i.mainloop()
+
+
+#velmi primitivny test, viac treba spravit vramci GUI
+testuj=False
+if testuj:
+    i= Inzeraty()
+    i.insert_user("admin","",0,i.passsword_hash("admin"),"admin")
+    i.create_advert("I want to sell my Laptop",datetime.date.today(),"admin",9999,"PC","Desktop","This is my very special pc, I built it lorem ipsum lorem ipsum")
+    i.log_in([0,"admin","admin"])
+    i.update_advert(145,"New Title",100,"Nábytok","Stôl","Novy text")
+    i.delete_advert(146)
